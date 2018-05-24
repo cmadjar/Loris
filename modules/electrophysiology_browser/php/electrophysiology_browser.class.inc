@@ -6,6 +6,28 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
     var $AjaxModule = true; // stops from running the query twice
 
+    /**
+     * Determine whether the user has permission to view this page
+     *
+     * @return bool whether the user hass access
+     */
+    function _hasAccess()
+    {
+        $user =& \User::singleton();
+
+        return ($user->hasPermission('electrophysiology_browser_view_allsites')
+                || ($user->hasPermission('electrophysiology_browser_view_site')
+                    && $user->hasStudySite()
+                   )
+        );
+    }
+
+    /**
+     * Set up the variables required by NDB_Menu_Filter class for
+     * constructing a query
+     *
+     * @return void
+     */
     function setup () {
         parent::setup();
 
@@ -14,7 +36,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
         // grep the sites available to the user
         // TODO change name of the permission
-        if ($user->hasPermission('physiological_browser_view_allsites')) {
+        if ($user->hasPermission('electrophysiology_browser_view_allsites')) {
             // get the list of study sites - to be replaced by the Site object
             $list_of_sites = \Utility::getSiteList();
             if (is_array($list_of_sites)) {
@@ -62,7 +84,13 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
     }
 
     function _setupVariables () { // setup the data table structure
-        $DB            = \Database::singleton();
+
+        // create database and user objects
+        $DB   = \Database::singleton();
+        $user = \User::singleton();
+
+        // select all imaging file types for EEG and concatenate them into an
+        // SQL string to be used later in the select query for the data table
         $file_type_arr = $DB->pselect(
             "SELECT type FROM ImagingFileTypes WHERE Description LIKE '%(EEG)'",
             array()
@@ -74,7 +102,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         }
         $file_types .= ')';
 
-        // set the header column name of the table to be displayed
+        // set the header column name of the data table to be displayed
         $this->headers = array(
             'Site', 'PSCID', 'DCCID', 'Visit Label', 'First Acquisition',
             'First Insertion'
@@ -89,14 +117,24 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
             "MIN(pf.AcquisitionTime)",
             "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d')"
         );
+
         // create the query
         $base_query = " FROM physiological_file pf"
                       . " LEFT JOIN session s ON s.ID=pf.SessionID"
                       . " LEFT JOIN candidate c USING (CandID)"
                       . " LEFT JOIN psc ON s.CenterID=psc.CenterID";
         $where = " WHERE s.Active = 'Y' AND pf.FileType IN " . $file_types;
-        $group = " GROUP BY SessionID";
-        $this->query = $base_query . $where . $group;
+        $this->query = $base_query . $where;
+
+        // check which sites the user has access to if not to all sites
+        if (!$user->hasPermission('electrophysiology_browser_view_allsites')) {
+            $site_arr = implode(",", $user->getCenterIDs());
+            $this->query .= " AND (c.CenterID IN (" . $site_arr . ")
+                              AND s.CenterID IN (" . $site_arr . "))";
+        }
+
+        // finish the query by grouping by SessionID
+        $this->query .= "GROUP BY SessionID";
 
         $this->validFilters = [
             'psc.Name',
