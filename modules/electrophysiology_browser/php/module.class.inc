@@ -7,19 +7,19 @@
  *
  * @category   Behavioural
  * @package    Main
- * @subpackage Physiological
+ * @subpackage Electrohysiology
  * @author     Cécile Madjar <cecile.madjar2@mcgill.ca>
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
-namespace LORIS\physiological_browser;
+namespace LORIS\electrophysiology_browser;
 
 /**
  * Class module implements the basic LORIS module functionality
  *
  * @category   Behavioural
  * @package    Main
- * @subpackage Physiological
+ * @subpackage Electophysiology
  * @author     Cécile Madjar <cecile.madjar2@mcgill.ca>
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/

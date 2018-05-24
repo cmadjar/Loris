@@ -90,7 +90,7 @@
 <script>
     var table = RDynamicDataTable(
         {
-            "DataURL" : "{$baseurl}/physiological_browser/?format=json"
+            "DataURL" : "{$baseurl}/electrophysiology_browser/?format=json"
         }
     );
     ReactDOM.render(table, document.getElementById("datatable"));

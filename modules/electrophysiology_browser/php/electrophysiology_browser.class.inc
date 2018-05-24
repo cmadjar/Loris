@@ -1,8 +1,8 @@
 <?php
 
-namespace LORIS\physiological_browser;
+namespace LORIS\electrophysiology_browser;
 
-class Physiological_Browser extends \NDB_Menu_Filter {
+class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
     var $AjaxModule = true; // stops from running the query twice
 
@@ -13,6 +13,7 @@ class Physiological_Browser extends \NDB_Menu_Filter {
         $user =& \User::singleton();
 
         // grep the sites available to the user
+        // TODO change name of the permission
         if ($user->hasPermission('physiological_browser_view_allsites')) {
             // get the list of study sites - to be replaced by the Site object
             $list_of_sites = \Utility::getSiteList();
