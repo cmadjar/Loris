@@ -59,7 +59,7 @@
             </div>
             <br class="visible-xs">
             <div id="advanced-buttons">
-                <div class="col-sm-4 col-md-3 col-xs-12 col-md-offset-3">
+                <div class="col-sm-4 col-md-3 col-xs-12 col-md-offset-6">
                     <input type="submit" name="filter" value="Show Data" id="showdata_advanced_options" class="btn btn-sm btn-primary col-xs-12" />
                 </div>
 
@@ -70,15 +70,7 @@
                 <div class="col-sm-4 col-md-3 col-xs-12">
                     <input type="button" name="reset" value="Clear Form"
                            class="btn btn-sm btn-primary col-xs-12"
-                           onclick="location.href='{$baseurl}/physiological_browser/?reset=true'" />
-                </div>
-                <div class="visible-xs col-xs-12"> </div>
-                <div class="visible-xs col-xs-12"> </div>
-                <div class="visible-xs col-xs-12"> </div>
-                <div class="visible-xs col-xs-12"> </div>
-                <div class="col-sm-4 col-md-3 col-xs-12">
-                    <input type="button" name="advanced" value="Advanced" class="btn btn-sm btn-primary col-xs-12 advanced-buttons" onclick="toggleMe()" />
-                    <input type="button" name="advanced" value="Basic" class="btn btn-sm btn-primary col-xs-12 advanced-buttons" onclick="toggleMe()" style="display:none;" />
+                           onclick="location.href='{$baseurl}/electrophysiology_browser/?reset=true'" />
                 </div>
             </div>
         </form>
