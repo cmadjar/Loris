@@ -34,13 +34,13 @@
                 </div>
             </div>
             <div class="row">
-                {if count($form.centerID.options) > 1}
+                {if count($form.siteID.options) > 1}
                     <div class="form-group col-sm-4">
                         <label class="col-sm-12 col-md-4">
-                            {$form.centerID.label}
+                            {$form.siteID.label}
                         </label>
                         <div class="col-sm-12 col-md-8">
-                            {$form.centerID.html}
+                            {$form.siteID.html}
                         </div>
                     </div>
                 {/if}
@@ -60,7 +60,7 @@
             <br class="visible-xs">
             <div id="advanced-buttons">
                 <div class="col-sm-4 col-md-3 col-xs-12 col-md-offset-6">
-                    <input type="submit" name="filter" value="Show Data" id="showdata_advanced_options" class="btn btn-sm btn-primary col-xs-12" />
+                    <input type="submit" name="filter" value="Show Data" id="menu_filter_submit" class="btn btn-sm btn-primary col-xs-12" />
                 </div>
 
                 <div class="visible-xs col-xs-12"> </div>

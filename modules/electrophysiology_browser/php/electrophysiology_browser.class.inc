@@ -28,14 +28,14 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
      *
      * @return void
      */
-    function setup () {
+    function setup ()
+    {
         parent::setup();
 
         // create user object
         $user =& \User::singleton();
 
         // grep the sites available to the user
-        // TODO change name of the permission
         if ($user->hasPermission('electrophysiology_browser_view_allsites')) {
             // get the list of study sites - to be replaced by the Site object
             $list_of_sites = \Utility::getSiteList();
@@ -79,12 +79,13 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
                 "maxlength" => 25,
             )
         );
-        $this->addSelect('centerID', 'Site', $list_of_sites);
-        $this->addSelect('fileType', 'File Type', $file_type_list);
+        $this->addSelect('siteID', 'Site', $list_of_sites);
+
+        return true;
     }
 
-    function _setupVariables () { // setup the data table structure
-
+    function _setupVariables () // setup the data table structure
+    {
         // create database and user objects
         $DB   = \Database::singleton();
         $user = \User::singleton();
@@ -136,18 +137,50 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         // finish the query by grouping by SessionID
         $this->query .= "GROUP BY SessionID";
 
-        $this->validFilters = [
+        $this->validFilters = array(
             'psc.Name',
             'c.PSCID',
             'c.CandID',
             's.Visit_label'
-        ];
-        $this->formToFilter = [
-            'site'        => 'psc.Name',
-            'pscid'       => 'c.PSCID',
-            'dccid'       => 'c.CandID',
-            'visit_label' => 's.Visit_label'
-        ];
+        );
+
+        $this->formToFilter = array( 'site' => 'psc.Name' );
+
+        $this->searchKeyword = array(
+            'c.PSCID',
+            'c.CandID',
+            's.Visit_label'
+        );
+
+        return true;
+    }
+
+    /**
+     * Add query filters
+     *
+     * @param string $prepared_key the query string
+     * @param string $field        the key of the filter
+     * @param string $val          the value of the filter
+     *
+     * @return string of the new query
+     * @access private
+     */
+    function _addValidFilters($prepared_key, $key, $val)
+    {
+        $query = '';
+
+        if ((!empty($val) || $val === '0') && key != 'order') {
+
+            if (in_array($key, $this->CheckboxFilters) && $val) {
+                $query .= " AND $field";
+            } elseif (strtolower(substr($key, -8)) == 'centerid') {
+                $query .= " AND $key = :v_$prepared_key";
+            } else {
+                $query .= " AND $key LIKE CONCAT('%', :v_$prepared_key, '%') ";
+            }
+
+        }
+        return $query;
     }
 
 }
