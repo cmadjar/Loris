@@ -4,7 +4,8 @@ namespace LORIS\electrophysiology_browser;
 
 class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
-    var $AjaxModule = true; // stops from running the query twice
+    public $AjaxModule   = true; // stops from running the query twice
+    public $skipTemplate = true; // stops from looking for a smarty template
 
     /**
      * Determine whether the user has permission to view this page
@@ -55,37 +56,18 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
             array()
         );
 
-        $this->addBasicText(
-            'PSCID',
-            'PSCID',
-            array(
-                "size"      => 10,
-                "maxlength" => 25,
-            )
-        );
-        $this->addBasicText(
-            'DCCID',
-            'DCCID',
-            array(
-                "size"      => 10,
-                "maxlength" => 25,
-            )
-        );
-        $this->addBasicText(
-            'visitLabel',
-            'Visit Label',
-            array(
-                "size"      => 10,
-                "maxlength" => 25,
-            )
-        );
-        $this->addSelect('siteID', 'Site', $list_of_sites);
+        // Form Elements
+        $this->addBasicText('pSCID', 'PSCID');
+        $this->addBasicText('candId', 'DCCID');
+        $this->addBasicText('visitLabel', 'Visit Label');
+        $this->addSelect('site', 'Site', $list_of_sites);
 
         return true;
     }
 
     function _setupVariables () // setup the data table structure
     {
+
         // create database and user objects
         $DB   = \Database::singleton();
         $user = \User::singleton();
@@ -111,15 +93,15 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
         // set the field names of the MySQL tables
         $this->columns = array(
-            "psc.Name",
-            "c.PSCID",
-            "c.CandID",
-            "s.Visit_label",
-            "MIN(pf.AcquisitionTime)",
-            "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d')"
+            "psc.Name AS site",
+            "c.PSCID AS pscid",
+            "c.CandID AS cand_id",
+            "s.Visit_label AS visit_label",
+            "MIN(pf.AcquisitionTime) AS acquisition_time",
+            "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d') AS insert_time"
         );
 
-        // create the query
+        // create the base query
         $base_query = " FROM physiological_file pf"
                       . " LEFT JOIN session s ON s.ID=pf.SessionID"
                       . " LEFT JOIN candidate c USING (CandID)"
@@ -134,53 +116,42 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
                               AND s.CenterID IN (" . $site_arr . "))";
         }
 
-        // finish the query by grouping by SessionID
-        $this->query .= "GROUP BY SessionID";
-
-        $this->validFilters = array(
-            'psc.Name',
-            'c.PSCID',
-            'c.CandID',
-            's.Visit_label'
-        );
-
-        $this->formToFilter = array( 'site' => 'psc.Name' );
-
-        $this->searchKeyword = array(
-            'c.PSCID',
-            'c.CandID',
-            's.Visit_label'
-        );
+        // set the group by and order by of the query
+        $this->group_by = " SessionID";
+        $this->order_by = " c.PSCID";
 
         return true;
     }
 
     /**
-     * Add query filters
+     * Converts the results of this menu filter to a JSON format to be retrieved
+     * with ?format=json
      *
-     * @param string $prepared_key the query string
-     * @param string $field        the key of the filter
-     * @param string $val          the value of the filter
-     *
-     * @return string of the new query
-     * @access private
+     * @return string a json encoded string of the headers and data from this table
      */
-    function _addValidFilters($prepared_key, $key, $val)
+    function toJSON()
     {
-        $query = '';
+        $result         = $this->toArray();
+        $result['form'] = $this->form->form;
+        return json_encode($result);
+    }
 
-        if ((!empty($val) || $val === '0') && key != 'order') {
-
-            if (in_array($key, $this->CheckboxFilters) && $val) {
-                $query .= " AND $field";
-            } elseif (strtolower(substr($key, -8)) == 'centerid') {
-                $query .= " AND $key = :v_$prepared_key";
-            } else {
-                $query .= " AND $key LIKE CONCAT('%', :v_$prepared_key, '%') ";
-            }
-
-        }
-        return $query;
+    /**
+     * Include additional JS files
+     *
+     * @return array of extra JS files that this page depends on
+     */
+    function getJSDependencies()
+    {
+        $factory = \NDB_Factory::singleton();
+        $baseURL = $factory->settings()->getBaseURL();
+        $deps    = parent::getJSDependencies();
+        return array_merge(
+            $deps,
+            array(
+                $baseURL . "/electrophysiology_browser/js/electrophysiology_browser.js",
+            )
+        );
     }
 
 }
