@@ -1,6 +1,29 @@
 <?php
 
+/**
+ * This class features the code for the menu portion of the LORIS
+ * electrophysiology browser module.
+ *
+ * PHP version 7
+ *
+ * @category   Behavioural
+ * @package    Main
+ * @subpackage Electrophysiology
+ * @author     Loris team <info-loris.mni@mcgill.ca>
+ * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
+ * @link       https://github.com/aces/Loris
+ */
 namespace LORIS\electrophysiology_browser;
+/**
+ * Provides the PHP code for the menu filter for the electrophysiology browser
+ *
+ * @category   Behavioural
+ * @package    Main
+ * @subpackage Electrophysiology
+ * @author     Loris team <info-loris.mni@mcgill.ca>
+ * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
+ * @link       https://github.com/aces/Loris
+*/
 
 class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
