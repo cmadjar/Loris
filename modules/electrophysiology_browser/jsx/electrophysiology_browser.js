@@ -1,5 +1,5 @@
 import FilterForm from 'FilterForm';
-import formatColumn from "../../media/jsx/columnFormatter";
+import formatColumn from './columnFormatter';
 
 
 /**
@@ -20,6 +20,8 @@ class ElectrophysiologyBrowser extends React.Component {
   constructor(props) {
     super(props);
 
+    loris.hiddenHeaders = ['Session ID'];
+
     this.state = {
       isLoaded: false,
       filter  : {}
@@ -36,14 +38,15 @@ class ElectrophysiologyBrowser extends React.Component {
   }
 
   /**
-   * Retrieve data from the provided URL and save it in state
+   * Retrieve data from the provided URL and save it in state.
+   * Additionaly add hiddenHeaders to global LORIS vairiable
+   * for easy access by columnFormatter.
    */
   fetchData() {
     $.ajax(this.props.DataURL, {
       method: "GET",
       dataType: 'json',
       success: function(data) {
-        loris.hiddenHeaders = data.hiddenHeaders ? data.hiddenHeaders : [];
         this.setState({
           Data: data,
           isLoaded: true

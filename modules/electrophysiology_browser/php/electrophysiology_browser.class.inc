@@ -97,7 +97,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         // set the header column name of the data table to be displayed
         $this->headers = array(
             'Site', 'PSCID', 'DCCID', 'Visit Label', 'First Acquisition',
-            'First Insertion'
+            'First Insertion', 'Raw EEG', 'Session ID'
         );
 
         // set the field names of the MySQL tables
@@ -107,7 +107,9 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
             "c.CandID AS dccid",
             "s.Visit_label AS visit_label",
             "MIN(pf.AcquisitionTime) AS acquisition_time",
-            "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d') AS insert_time"
+            "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d') AS insert_time",
+            "'View files' AS raw_eeg",
+            "s.ID AS session_id",
         );
 
         // create the base query
@@ -159,6 +161,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
             $deps,
             array(
                 $baseURL . "/electrophysiology_browser/js/electrophysiology_browser.js",
+                $baseURL . "/electrophysiology_browser/js/columnFormatter.js",
             )
         );
     }
