@@ -13,14 +13,36 @@ function formatColumn(column, cell, rowData, rowHeaders) {
   }
 
   // Create the mapping between rowHeaders and rowData in a row object.
-  var row = {};
+  let row = {};
   rowHeaders.forEach(function(header, index) {
     row[header] = rowData[index];
   }, this);
 
-  if (column === 'Raw EEG') {
-    var rawURL = loris.BaseURL + "/electrophysiology_browser/view_raw/?sessionID=" + row["Session ID"];
-    return <td><a href={rawURL}>{cell}</a></td>;
+  // Create links for 'all types', 'raw' and 'derivatives' output types
+  if (column === 'Links') {
+    let cellTypes  = cell.split(",");
+    let cellLinks  = [];
+    let baseURL = loris.BaseURL + "/electrophysiology_browser/view_raw/";
+    let backURL = "&backURL=/electrophysiology_browser/";
+
+    // display the link for 'all types'
+    cellLinks.push(
+      <a key='all' href={baseURL + "?sessionID=" + row["Session ID"] + backURL}>
+        all types
+      </a>
+    );
+
+    // display the link for raw and derivatives when they exist
+    for (let i = 0; i < cellTypes.length; i++) {
+      cellLinks.push(" | ");
+      let linkURL = baseURL
+                    + "?sessionID=" + row["Session ID"]
+                    + "&outputType=" + cellTypes[i]
+                    + backURL
+      cellLinks.push(<a key={i} href={linkURL}>{cellTypes[i]}</a>);
+    }
+
+    return (<td>{cellLinks}</td>);
   }
 
   return <td>{cell}</td>;

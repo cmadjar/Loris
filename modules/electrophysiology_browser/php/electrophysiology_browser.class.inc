@@ -120,7 +120,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         // set the header column name of the data table to be displayed
         $this->headers = array(
             'Site', 'PSCID', 'DCCID', 'Visit Label', 'First Acquisition',
-            'First Insertion', 'Raw EEG', 'Session ID'
+            'First Insertion', 'Links', 'Session ID'
         );
 
         // set the field names of the MySQL tables
@@ -131,7 +131,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
             "s.Visit_label AS visit_label",
             "MIN(pf.AcquisitionTime) AS acquisition_time",
             "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d') AS insert_time",
-            "'View files' AS raw_eeg",
+            "GROUP_CONCAT(DISTINCT pot.OutputType) AS links",
             "s.ID AS session_id",
         );
 
@@ -139,7 +139,9 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         $base_query = " FROM physiological_file pf"
                       . " LEFT JOIN session s ON s.ID=pf.SessionID"
                       . " LEFT JOIN candidate c USING (CandID)"
-                      . " LEFT JOIN psc ON s.CenterID=psc.CenterID";
+                      . " LEFT JOIN psc ON s.CenterID=psc.CenterID"
+                      . " LEFT JOIN physiological_output_type pot USING"
+                        . " (PhysiologicalOutputTypeID)";
         $where = " WHERE s.Active = 'Y' AND pf.FileType IN " . $file_types;
         $this->query = $base_query . $where;
 
