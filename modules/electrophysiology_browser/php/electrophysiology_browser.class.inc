@@ -67,7 +67,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
         // Form Elements
         $this->addBasicText('pSCID', 'PSCID');
-        $this->addBasicText('candID', 'DCCID');
+        $this->addBasicText('dCCID', 'DCCID');
         $this->addBasicText('visitLabel', 'Visit Label');
         $this->addSelect('site', 'Site', $list_of_sites);
 
@@ -104,7 +104,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         $this->columns = array(
             "psc.Name AS site",
             "c.PSCID AS pscid",
-            "c.CandID AS cand_id",
+            "c.CandID AS dccid",
             "s.Visit_label AS visit_label",
             "MIN(pf.AcquisitionTime) AS acquisition_time",
             "FROM_UNIXTIME(MIN(pf.InsertTime), '%Y-%m-%d') AS insert_time"
