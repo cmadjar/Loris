@@ -37,16 +37,25 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
         $user =& \User::singleton();
 
         // grep the sites available to the user
+        $list_of_sites = array();
         if ($user->hasPermission('electrophysiology_browser_view_allsites')) {
             // get the list of study sites - to be replaced by the Site object
-            $list_of_sites = \Utility::getSiteList();
-            if (is_array($list_of_sites)) {
-                $list_of_sites = array('' => 'All') + $list_of_sites;
+            $list_of_sites = \Utility::getSiteList(false);
+            // Index sites using their names (used to filter react tables)
+            foreach ($list_of_sites as $key => $site) {
+                unset($list_of_sites[$key]);
+                $list_of_sites[$site] = $site;
             }
         } else {
             // allow only to view own site data
-            $list_of_sites = $user->getStudySites();
-            $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
+            $siteIDs = $user->getData('CenterIDs');
+            // Index sites using their names (used to filter react tables)
+            foreach ($siteIDs as $val) {
+                $site =& \Site::singleton($val);
+                if ($site->isStudySite()) {
+                    $list_of_sites[$site->getCenterName()] = $site->getCenterName();
+                }
+            }
         }
 
         // grep the file types from ImagingFileType
@@ -58,7 +67,7 @@ class Electrophysiology_Browser extends \NDB_Menu_Filter {
 
         // Form Elements
         $this->addBasicText('pSCID', 'PSCID');
-        $this->addBasicText('candId', 'DCCID');
+        $this->addBasicText('candID', 'DCCID');
         $this->addBasicText('visitLabel', 'Visit Label');
         $this->addSelect('site', 'Site', $list_of_sites);
 

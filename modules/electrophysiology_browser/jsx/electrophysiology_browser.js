@@ -27,8 +27,8 @@ class ElectrophysiologyBrowser extends React.Component {
 
     //Bind component instance to custom methods
     this.fetchData    = this.fetchData.bind(this);
-    this.updateFilter = this.updateFilter(this);
-    this.resetFilters = this.resetFilters(this);
+    this.updateFilter = this.updateFilter.bind(this);
+    this.resetFilters = this.resetFilters.bind(this);
   }
 
   componentDidMount() {
@@ -40,11 +40,12 @@ class ElectrophysiologyBrowser extends React.Component {
    */
   fetchData() {
     $.ajax(this.props.DataURL, {
-      method  : "GET",
-      dataType: "json",
-      success : function(data) {
+      method: "GET",
+      dataType: 'json',
+      success: function(data) {
+        loris.hiddenHeaders = data.hiddenHeaders ? data.hiddenHeaders : [];
         this.setState({
-          Data    : data,
+          Data: data,
           isLoaded: true
         });
       }.bind(this),
@@ -77,25 +78,21 @@ class ElectrophysiologyBrowser extends React.Component {
     return (
       <div>
         <FilterForm
-          Module  = 'electrophysiology_browser'
-          name    = 'electrophysiology_filter'
-          id      = 'electrophysiology_filter_form'
-          ref     = 'electrophysiologyFilter'
-          columns = {2}
-          formElements = {this.state.Data.form}
-          onUpdate = {this.updateFilter}
-          filter   = {this.state.filter}
+          Module='electrophysiology_browser'
+          name='electrophysiology_filter'
+          id='electrophysiology_filter_form'
+          ref='electrophysiologyFilter'
+          columns={2}
+          formElements={this.state.Data.form}
+          onUpdate={this.updateFilter}
+          filter={this.state.filter}
         >
-          <ButtonElement
-            label = 'Clear Filters'
-            type  = 'reset'
-            onUserInput = {this.resetFilters}
-          />
+          <ButtonElement label='Clear Filters' type='reset' onUserInput = {this.resetFilters}/>
         </FilterForm>
         <StaticDataTable
-          Data    = {this.state.Data.Data}
-          Headers = {this.state.Data.Headers}
-          Filter  = {this.state.filter}
+          Data={this.state.Data.Data}
+          Headers={this.state.Data.Headers}
+          Filter={this.state.filter}
           getFormattedCell={formatColumn}
         />
       </div>
@@ -104,16 +101,15 @@ class ElectrophysiologyBrowser extends React.Component {
 }
 
 
-
 /**
  * Render electrophysiology browser page on load
  */
 window.onload = function () {
-  let dataURL = loris.BaseURL + 'electrophysiology_browser/?format=json';
+  let dataURL = loris.BaseURL + '/electrophysiology_browser/?format=json';
   let electrophysiologyBrowser = (
     <ElectrophysiologyBrowser
-      Module  = 'electrophysiology_browser'
-      DataURL = {dataURL}
+      Module='electrophysiology_browser'
+      DataURL={dataURL}
     />
   );
 
