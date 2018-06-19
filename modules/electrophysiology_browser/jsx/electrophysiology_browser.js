@@ -63,7 +63,7 @@ class ElectrophysiologyBrowser extends React.Component {
   }
 
   resetFilters() {
-    this.refs.electrophysiologyFilter.clearFilter();
+    this.electrophysiologyFilter.clearFilter();
   }
 
   render() {
@@ -78,13 +78,17 @@ class ElectrophysiologyBrowser extends React.Component {
       );
     }
 
+    const filterRef = function(f) {
+      this.electrophysiologyFilter = f;
+    }.bind(this);
+
     return (
       <div>
         <FilterForm
           Module='electrophysiology_browser'
           name='electrophysiology_filter'
           id='electrophysiology_filter_form'
-          ref='electrophysiologyFilter'
+          ref={electrophysiologyFilter}
           columns={2}
           formElements={this.state.Data.form}
           onUpdate={this.updateFilter}
