@@ -40,9 +40,10 @@ INSERT INTO LorisMenu (Label, OrderNumber) VALUES
      ('Candidate', 1),
      ('Clinical', 2),
      ('Imaging', 3),
-     ('Reports', 4),
-     ('Tools', 5),
-     ('Admin', 6);
+     ('Electrophysiology', 4)
+     ('Reports', 5),
+     ('Tools', 6),
+     ('Admin', 7);
 
 
 INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
@@ -63,6 +64,9 @@ INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
     ('Imaging Browser', 'imaging_browser/', (SELECT ID FROM LorisMenu as L WHERE Label='Imaging'), 2),
     ('MRI Violated Scans', 'mri_violations/', (SELECT ID FROM LorisMenu as L WHERE Label='Imaging'), 3),
     ('Imaging Uploader', 'imaging_uploader/', (SELECT ID FROM LorisMenu as L WHERE Label='Imaging'), 4);
+
+INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
+    ('Electrophysiology Browser', 'electrophysiology_browser/', (SELECT ID FROM LorisMenu as L WHERE Label='Electrophysiology'), 1);
 
 INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
     ('Statistics', 'statistics/', (SELECT ID FROM LorisMenu as L WHERE Label='Reports'), 1),
