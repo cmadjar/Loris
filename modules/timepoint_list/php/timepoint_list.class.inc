@@ -93,7 +93,6 @@ class Timepoint_List extends \NDB_Menu
             $gets         = $request->getQueryParams();
             $this->candID = $gets['candID'];
         }
-        $this->setup();
         return parent::process($request, $handler);
     }
 
@@ -299,4 +298,29 @@ class Timepoint_List extends \NDB_Menu
             )
         );
     }
+
+    /**
+     * Generate a breadcrumb trail for this page.
+     *
+     * @return \LORIS\BreadcrumbTrail
+     */
+    public function getBreadcrumbs(): \LORIS\BreadcrumbTrail
+    {
+        $candid = $this->tpl_data['candID'];
+        $pscid  = $this->tpl_data['PSCID'];
+
+        $link = ltrim($_SERVER['REQUEST_URI'], '/');
+
+        return new \LORIS\BreadcrumbTrail(
+            new \LORIS\Breadcrumb(
+                'Access Profile',
+                '/candidate_list'
+            ),
+            new \LORIS\Breadcrumb(
+                "Candidate Profile $candid / $pscid",
+                "/$candid"
+            )
+        );
+    }
 }
+

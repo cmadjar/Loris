@@ -191,7 +191,6 @@ class Candidate_List extends \NDB_Menu_Filter
             )
         );
 
-        return true;
     }
 
 
@@ -353,5 +352,17 @@ class Candidate_List extends \NDB_Menu_Filter
             )
         );
     }
+
+    /**
+     * Generate a breadcrumb trail for this page.
+     *
+     * @return \LORIS\BreadcrumbTrail
+     */
+    public function getBreadcrumbs(): \LORIS\BreadcrumbTrail
+    {
+        return new \LORIS\BreadcrumbTrail(
+            new \LORIS\Breadcrumb('Access Profile', "/$this->name")
+        );
+    }
 }
-?>
+

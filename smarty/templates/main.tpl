@@ -23,22 +23,22 @@
 
         <title>
             {$study_title}
-            {if $crumbs != ""}
-                {section name=crumb loop=$crumbs}
-                    - {$crumbs[crumb].text}
-                {/section}
-            {/if}
         </title>
         <script type="text/javascript">
           $(document).ready(function() {
-            {if $crumbs != "" && empty($error_message)}
-              var crumbs = {$crumbs|@json_encode},
-                      baseurl = "{$baseurl}",
-                      breadcrumbs = RBreadcrumbs({
-                        breadcrumbs: crumbs,
-                        baseURL: baseurl
-                      });
-              ReactDOM.render(breadcrumbs, document.getElementById("breadcrumbs"));
+            {if $breadcrumbs != "" && empty($error_message)}
+              const breadcrumbs = [{$breadcrumbs}];
+
+              ReactDOM.render(
+                RBreadcrumbs({
+                  breadcrumbs: breadcrumbs,
+                  baseURL: loris.BaseURL
+                }),
+                document.getElementById("breadcrumbs")
+              );
+              document.title = document.title.concat(breadcrumbs.reduce(function (carry, item) {
+                return carry.concat(' - ', item.text);
+              }, ''));
             {/if}
 
             // Initialize bootstrap tooltip for site affiliations
@@ -216,13 +216,13 @@
                     </div>
 
                 {/if}
-                {if $crumbs != "" && empty($error_message)}
+                {if $breadcrumbs != "" && empty($error_message)}
                     <div id="breadcrumbs"></div>
                 {/if}
                         <div>
                             {if $error_message != ""}
                                 <p>
-                                    The following errors occured while attempting to display this page:
+                                    The following errors occurred while attempting to display this page:
                                     <ul>
                                         {section name=error loop=$error_message}
                                             <li>
