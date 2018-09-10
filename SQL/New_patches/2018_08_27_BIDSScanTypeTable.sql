@@ -41,7 +41,7 @@ CREATE TABLE `bids_mri_scan_type_rel` (
   `MRIScanTypeID`             int(10) UNSIGNED NOT NULL,
   `BIDSCategoryID`            int(3)           DEFAULT NULL,
   `BIDSScanTypeSubCategoryID` int(3)           DEFAULT NULL,
-  `BIDSScanType`              int(3)           DEFAULT NULL,
+  `BIDSScanTypeID`            int(3)           DEFAULT NULL,
   `BIDSEchoNumber`            int(3)           DEFAULT NULL,
   PRIMARY KEY  (`MRIScanTypeID`),
   KEY `FK_bids_mri_scan_type_rel` (`MRIScanTypeID`),
