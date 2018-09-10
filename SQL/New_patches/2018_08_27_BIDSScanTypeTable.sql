@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS bids_scan_type;
 DROP TABLE IF EXISTS bids_scan_type_subcategory;
 
 CREATE TABLE `bids_category` (
- `BIDSCategoryID`  int(3)      NOT NULL AUTO_INCREMENT,
- `ImagingCategory` varchar(10) NOT NULL UNIQUE,
+ `BIDSCategoryID`   int(3)      NOT NULL AUTO_INCREMENT,
+ `BIDSCategoryName` varchar(10) NOT NULL UNIQUE,
  PRIMARY KEY (`BIDSCategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -58,35 +58,35 @@ INSERT INTO bids_mri_scan_type_rel
   VALUES
   (
     (SELECT ID FROM mri_scan_type WHERE Scan_type = 'flair'),
-    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategory='anat'),
+    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategoryName='anat'),
     NULL,
     (SELECT BIDSScanTypeID FROM bids_scan_type WHERE BIDSSCanType='FLAIR'),
     NULL
   ),
   (
     (SELECT ID FROM mri_scan_type WHERE Scan_type = 'fMRI'),
-    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategory='func'),
+    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategoryName='func'),
     (SELECT BIDSScanTypeSubCategoryID FROM bids_scan_type_subcategory WHERE BIDSScanTypeSubCategory='task-rest'),
     (SELECT BIDSScanTypeID FROM bids_scan_type WHERE BIDSSCanType='bold'),
     NULL
   ),
   (
     (SELECT ID FROM mri_scan_type WHERE Scan_type = 't1'),
-    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategory='anat'),
+    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategoryName='anat'),
     NULL,
     (SELECT BIDSScanTypeID FROM bids_scan_type WHERE BIDSSCanType='T1w'),
     NULL
   ),
   (
     (SELECT ID FROM mri_scan_type WHERE Scan_type = 't2'),
-    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategory='anat'),
+    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategoryName='anat'),
     NULL,
     (SELECT BIDSScanTypeID FROM bids_scan_type WHERE BIDSSCanType='T2w'),
     NULL
   ),
   (
     (SELECT ID FROM mri_scan_type WHERE Scan_type = 'dti'),
-    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategory='dwi'),
+    (SELECT BIDSCategoryID FROM bids_category WHERE BIDSCategoryName='dwi'),
     NULL,
     (SELECT BIDSScanTypeID FROM bids_scan_type WHERE BIDSSCanType='dwi'),
     NULL
