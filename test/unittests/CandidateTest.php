@@ -29,18 +29,18 @@ class CandidateTest extends TestCase
      */
     private $_candidateInfo
         = array(
-           'CenterID'     => '2',
-           'CandID'       => '969664',
-           'PSCID'        => 'AAA0011',
-           'DoB'          => '2007-03-02',
-           'EDC'          => null,
-           'Gender'       => 'Male',
-           'PSC'          => 'AAA',
-           'Ethnicity'    => null,
-           'Active'       => 'Y',
-           'RegisteredBy' => 'Admin Admin',
-           'UserID'       => 'admin',
-           'ProjectID'    => 1,
+           'RegistrationCenterID' => '2',
+           'CandID'               => '969664',
+           'PSCID'                => 'AAA0011',
+           'DoB'                  => '2007-03-02',
+           'EDC'                  => null,
+           'Gender'               => 'Male',
+           'PSC'                  => 'AAA',
+           'Ethnicity'            => null,
+           'Active'               => 'Y',
+           'RegisteredBy'         => 'Admin Admin',
+           'UserID'               => 'admin',
+           'ProjectID'            => 1,
           );
 
     /**

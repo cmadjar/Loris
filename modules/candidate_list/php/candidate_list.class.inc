@@ -67,7 +67,7 @@ class Candidate_List extends \NDB_Menu_Filter
 
         // set the class variables
         $this->columns = array(
-                          'psc.Name AS Site',
+                          'psc.Name AS RegistrationSite',
                           'c.CandID AS DCCID',
                           'c.PSCID',
                           'c.Gender',
@@ -88,7 +88,7 @@ class Candidate_List extends \NDB_Menu_Filter
         );
 
         $this->formToFilter = array(
-                               'centerID'     => 'c.CenterID',
+                               'centerID'     => 's.CenterID',
                                'DCCID'        => 'c.CandID',
                                'PSCID'        => 'c.PSCID',
                                'gender'       => 'c.Gender',
@@ -97,7 +97,7 @@ class Candidate_List extends \NDB_Menu_Filter
 
         $this->validFilters = array(
                                'pso.ID',
-                               'c.CenterID',
+                               's.CenterID',
                                'c.CandID',
                                'c.PSCID',
                                'c.Gender',
@@ -122,7 +122,7 @@ class Candidate_List extends \NDB_Menu_Filter
         );
 
         $this->query = " FROM candidate c
-            LEFT JOIN psc ON (c.CenterID=psc.CenterID)
+            LEFT JOIN psc ON (c.RegistrationCenterID=psc.CenterID)
             LEFT JOIN session s ON (c.CandID = s.CandID AND s.Active = 'Y')
             LEFT JOIN feedback_bvl_thread
                 ON (c.CandID=feedback_bvl_thread.CandID)
@@ -136,7 +136,7 @@ class Candidate_List extends \NDB_Menu_Filter
         if (!$user->hasPermission('access_all_profiles')) {
 
             $site_arr     = implode(",", $user->getCenterIDs());
-            $this->query .= " AND c.CenterID IN (" . $site_arr . ")";
+            $this->query .= " AND s.CenterID IN (" . $site_arr . ")";
         }
 
         //'COALESCE(pso.ID,1) AS Participant_Status',
@@ -168,7 +168,7 @@ class Candidate_List extends \NDB_Menu_Filter
                                     );
         $this->EqualityFilters    = array(
                                      's.SubprojectID',
-                                     'c.CenterID',
+                                     's.CenterID',
                                      'c.ProjectID',
                                      's.Scan_done',
                                      's.Visit_label',
