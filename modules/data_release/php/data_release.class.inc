@@ -36,13 +36,13 @@ class Data_Release extends \NDB_Menu_Filter
         $user =& \User::singleton();
 
         $Factory = \NDB_Factory::singleton();
-        $DB      = $Factory->Database();
+        $DB = $Factory->Database();
 
         // set the class variables
         $this->columns = array(
-                          'file_name',
+                          'file_name AS fileName',
                           'version',
-                          'upload_date',
+                          'upload_date AS uploadDate',
                          );
         $this->query   = " FROM data_release dr";
 
@@ -57,22 +57,23 @@ class Data_Release extends \NDB_Menu_Filter
         $this->group_by     = '';
         $this->order_by     = 'upload_date';
         $this->headers      = array(
-                               'file_name',
+                               'fileName',
                                'version',
-                               'upload_date',
-                              );
-        $this->validFilters = array(
-                               'file_name',
-                               'version',
-                               'upload_date',
-                              );
-        $this->formToFilter = array(
-                               'file_name'   => 'file_name',
-                               'version'     => 'version',
-                               'upload_date' => 'upload_date',
+                               'uploadDate',
                               );
 
-        $user_ID   = $DB->pselectOne(
+        $this->validFilters = array(
+            'fileName',
+            'version',
+            'uploadDate',
+        );
+        $this->formToFilter = array(
+            'fileName' => 'fileName',
+            'version' => 'version',
+            'uploadDate' => 'uploadDate',
+        );
+
+        $user_ID = $DB->pselectOne(
             "SELECT ID FROM users WHERE userid=:UserID",
             array('UserID' => $user->getUsername())
         );
@@ -89,22 +90,31 @@ class Data_Release extends \NDB_Menu_Filter
         );
         $userids = array();
         foreach ($results as $row) {
-            $userids[$row['ID']] =$row['UserID'];
+            $userids[$row['ID']] = $row['UserID'];
         }
 
-        $results          = $DB->pselect(
+        $results = $DB->pselect(
             "SELECT id, file_name FROM data_release",
             array()
         );
         $data_release_ids = array();
         foreach ($results as $row) {
-            $data_release_ids[$row['id']] =$row['file_name'];
+            $data_release_ids[$row['id']] = $row['file_name'];
         }
 
-        $this->tpl_data['superuser']        = $superuser;
-        $this->tpl_data['userids']          = $userids;
+        $this->tpl_data['superuser'] = $superuser;
+        $this->tpl_data['userids'] = $userids;
         $this->tpl_data['data_release_ids'] = $data_release_ids;
 
+    }
+
+    function getJSDependencies() {
+        $factory = \NDB_Factory::singleton();
+        $baseurl = $factory->settings()->getBaseURL();
+        return array_merge(
+            parent::getJSDependencies() ,
+            array($baseurl . "/data_release/js/dataReleaseIndex.js",)
+        );
     }
 
 }

@@ -29,6 +29,7 @@ const config = [{
     './modules/dataquery/js/react.paginator.js': './modules/dataquery/jsx/react.paginator.js',
     './modules/dataquery/js/react.sidebar.js': './modules/dataquery/jsx/react.sidebar.js',
     './modules/dataquery/js/react.tabs.js': './modules/dataquery/jsx/react.tabs.js',
+    './modules/data_release/js/dataReleaseIndex.js': './modules/data_release/jsx/dataReleaseIndex.js',
     './modules/dicom_archive/js/dicom_archive.js': './modules/dicom_archive/jsx/dicom_archive.js',
     './modules/genomic_browser/js/FileUploadModal.js': './modules/genomic_browser/jsx/FileUploadModal.js',
     './modules/genomic_browser/js/profileColumnFormatter.js': './modules/genomic_browser/jsx/profileColumnFormatter.js',

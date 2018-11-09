@@ -24,7 +24,7 @@
                                 <input type="text" size = "27" name="version" id="version" class="ui-corner-all form-fields form-control input-sm" />
                             </div>
                         </div>
-                        <input type="hidden" name = "action" id = "action" value = "upload">
+                        <input type="hidden" name = "uploadAction" id = "uploadAction" value = "upload">
                         <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="100000000" />
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h3 class="modal-title" id="myModalLabel">Add Permission</h3>
             </div>
-            <form name = "uploadForm" id = "uploadForm" method = "POST" enctype="multipart/form-data" action="{$baseurl}/data_release/ajax/AddPermission.php">
+            <form name = "addPermissionForm" id = "addPermissionForm" method = "POST" enctype="multipart/form-data" action="{$baseurl}/data_release/ajax/AddPermission.php">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-xs-12 form-group">
@@ -72,11 +72,11 @@
                                 </select>
                             </div>
                         </div>
-                        <input type="hidden" name = "action" id = "action" value = "addpermission">
+                        <input type="hidden" name = "addPermissionAction" id = "addPermissionAction" value = "addpermission">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id = "uploadButton" role="button" aria-disabled="false">Add Permission</button>
+                    <button class="btn btn-primary" id = "addPermissionButton" role="button" aria-disabled="false">Add Permission</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
