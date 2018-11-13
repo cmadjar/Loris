@@ -469,7 +469,7 @@ class NDB_BVL_Feedback
         }
         $query .= " WHERE ft.Active ='Y'";
         if (!$hasReadPermission===true) {
-            $query            .= " AND FIND_IN_SET (s.CenterID,:CentID)";
+            $query            .= " AND s.CenterID IN (:CentID)";
             $qparams['CentID'] = implode(',', $user->getCenterIDs());
         }
 
@@ -582,7 +582,7 @@ class NDB_BVL_Feedback
             $qparams['Username'] = $this->_username;
         } else {
             $query            .= " AND ft.Active ='Y' 
-                                   AND FIND_IN_SET (s.CenterID,:CentID)";
+                                   AND s.CenterID IN (:CentID)";
             $qparams['CentID'] = implode(',', $user->getCenterIDs());
         }
 
