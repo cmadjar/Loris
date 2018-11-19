@@ -88,7 +88,7 @@ class Candidate_List extends \NDB_Menu_Filter
         );
 
         $this->formToFilter = array(
-                               'centerID'     => 's.CenterID',
+                               'centerID'     => 'c.RegistrationCenterID',
                                'DCCID'        => 'c.CandID',
                                'PSCID'        => 'c.PSCID',
                                'gender'       => 'c.Gender',
@@ -97,7 +97,7 @@ class Candidate_List extends \NDB_Menu_Filter
 
         $this->validFilters = array(
                                'pso.ID',
-                               's.CenterID',
+                               'c.RegistrationCenterID',
                                'c.CandID',
                                'c.PSCID',
                                'c.Gender',
@@ -168,7 +168,7 @@ class Candidate_List extends \NDB_Menu_Filter
                                     );
         $this->EqualityFilters    = array(
                                      's.SubprojectID',
-                                     's.CenterID',
+                                     'c.RegistrationCenterID',
                                      'c.ProjectID',
                                      's.Scan_done',
                                      's.Visit_label',
@@ -260,7 +260,7 @@ class Candidate_List extends \NDB_Menu_Filter
         $visits = array_merge(array('' => 'All'), $visits);
 
         // add form elements
-        $this->addSelect('centerID', 'Site', $list_of_sites);
+        $this->addSelect('centerID', 'Registration Site', $list_of_sites);
         $this->addBasicText('PSCID', 'PSCID');
         $this->addBasicText('DCCID', 'DCCID');
         $this->addBasicText('candID', 'DCCID');
