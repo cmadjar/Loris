@@ -63,10 +63,29 @@ class Electrophysiology_Session extends \NDB_Form {
         $depends = array_merge(
             $depends,
             array(
+                $baseurl . '/electrophysiology_browser/js/lib/react-series-data-viewer.js',
                 $baseurl . '/electrophysiology_browser/js/eeg_session_view.js',
             )
         );
         return $depends;
     }
 
+    /**
+     * Get CSS Dependencies
+     *
+     * @return array
+     */
+    function getCSSDependencies()
+    {
+        $depends = parent::getCSSDependencies();
+        $factory = \NDB_Factory::singleton();
+        $baseurl = $factory->settings()->getBaseURL();
+        $depends = array_merge(
+            $depends,
+            array(
+                $baseurl . '/electrophysiology_browser/css/react-series-data-viewer-scoped-styles.css',
+            )
+        );
+        return $depends;
+    }
 }

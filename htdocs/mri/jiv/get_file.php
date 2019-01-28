@@ -175,6 +175,10 @@ case 'DICOMTAR':
     $MimeType         = 'application/x-tar';
     $DownloadFilename = basename($File);
     break;
+case 'json':
+    $FullPath         = $imagePath . '/' . $File;
+    $MimeType         = 'application/json';
+    break;
 default:
     $FullPath         = $DownloadPath . '/' . $File;
     $MimeType         = 'application/octet-stream';
