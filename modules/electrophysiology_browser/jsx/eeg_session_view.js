@@ -1,3 +1,7 @@
+const demoElement = document.querySelector("#demo");
+if (demoElement) {
+  render(<Demo />, demoElement);
+}
 /**
  * This is the React class for the eeg_session.
  *
@@ -132,8 +136,10 @@ class EEGSessionView extends React.Component {
               }
             ]
           },
+          chunkDirectoryURL: null,
+	  epochsTableURL: null
         }
-      ]
+      ],
     };
 
     // Bind component instance to custom methods
@@ -185,11 +191,16 @@ class EEGSessionView extends React.Component {
           };
           appState.isLoaded = true;
           appState.patient.info = data.patient;
-          let database = [];
-          for (let i = 0; i < data.database.length; i++) {
-            database.push(data.database[i]);
-          }
+
+          const database = data.database.map(d => ({ 
+            ...d,
+            // EEG Visualisation urls
+            chunkDirectoryURL: d && `${window.location.origin}/mri/jiv/get_file.php?file=${d.file.chunks_url}`,
+            epochsTableURL: d && `${window.location.origin}/mri/jiv/get_file.php?file=${d.file.downloads[3].file}`
+          }));
+
           appState.database = database;
+
           this.setState(appState);
           document.getElementById('nav_next').href =
             window.location.origin + '/electrophysiology_browser/electrophysiology_session/?sessionID=' + data.nextSession + '&backURL=/electrophysiology_browser/';
@@ -235,16 +246,35 @@ class EEGSessionView extends React.Component {
       );
     }
 
+
     if (this.state.isLoaded) {
       let database = [];
       for (let i = 0; i < this.state.database.length; i++) {
+        const { chunkDirectoryURL, epochsTableURL } = this.state.database[i];
+
         database.push(
           <div>
             <FilePanel
               id={'filename_panel_' + i}
               title={this.state.database[i].file.name}
               data={this.state.database[i].file}
-            />
+            >
+	      <div className="react-series-data-viewer-scoped" style={{ paddingBottom: "50px", width: "100%" }}>
+                <ReactSeriesDataViewer.EEGLabSeriesProvider
+                  chunkDirectoryURLs={chunkDirectoryURL}
+                  epochsTableURLs={epochsTableURL}
+                >
+                  <div>
+                    <div style={{ width: "100%", height: "50px" }}>
+                      <ReactSeriesDataViewer.IntervalSelect />
+                    </div>
+                    <div style={{ width: "100%", height: "400px" }}>
+                      <ReactSeriesDataViewer.SeriesRenderer />
+                    </div>
+                  </div>
+                </ReactSeriesDataViewer.EEGLabSeriesProvider>
+              </div>
+            </FilePanel>
           </div>
         );
       }

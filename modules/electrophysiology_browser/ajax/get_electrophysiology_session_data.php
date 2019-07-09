@@ -22,6 +22,8 @@ require_once 'BIDSFile.class.inc';
  * have the view site permission and belong to candidates session site
  * are able to fetch the eeg session data.
  */
+
+
 $user =& \User::singleton();
 $timePoint =& \TimePoint::singleton($_REQUEST['sessionID']);
 if (!$user->hasPermission('electrophysiology_browser_view_allsites')
@@ -146,6 +148,7 @@ function getFilesData($sessionID)
         $fileSummary['details']['device']['serial_number'] = $physiologicalFileObj->getParameter('DeviceSerialNumber');
         $fileSummary['details']['subject_artefact_description'] = $physiologicalFileObj->getParameter('SubjectArtefactDescription');
         $fileSummary['downloads'] = getDownloadLinks($physiologicalFileID, $physiologicalFile);
+	$fileSummary['chunks_url'] = $physiologicalFileObj->getParameter('electrophyiology_chunked_dataset_path');
 
         $fileCollection[]['file'] = $fileSummary;
     }

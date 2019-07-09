@@ -162,6 +162,11 @@ class FilePanel extends React.Component {
       <Panel id={this.props.id} title={'FILENAME ' + this.props.title}>
         <div className={'container-fluid'}>
           <div className={'row'}>
+            <Panel id={`${this.props.id} - children}`} title={''}>
+              {this.props.children}
+            </Panel>
+          </div>
+          <div className={'row'}>
             {/*<div className={'col-sm-4'} style={stylesFile.div.container.details}>*/}
               {/*..insert head image here..*/}
             {/*</div>*/}
