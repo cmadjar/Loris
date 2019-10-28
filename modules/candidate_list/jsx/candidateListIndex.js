@@ -202,6 +202,19 @@ class CandidateListIndex extends Component {
         },
       },
       {
+        'label': 'EEG Done',
+        'show': true,
+        'filter': {
+          name: 'eegDone',
+          type: 'select',
+          hide: this.state.hideFilter,
+          options: {
+            'Y': 'Yes',
+            'N': 'No',
+          },
+        },
+      },
+      {
         'label': 'Participant Status',
         'show': true,
         'filter': {
@@ -209,15 +222,6 @@ class CandidateListIndex extends Component {
           type: 'select',
           hide: this.state.hideFilter,
           options: options.participantstatus,
-        },
-      },
-      {
-        'label': 'DoB',
-        'show': true,
-        'filter': {
-          name: 'DoB',
-          type: 'date',
-          hide: this.state.hideFilter,
         },
       },
       {
