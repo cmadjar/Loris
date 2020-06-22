@@ -184,7 +184,7 @@ if ($mode === VISIT_EXPORT) {
     // Format of output filename: <table_column_dataExtract_output.csv>
     $filename = sprintf(
         "%s_dataExtract_output.csv",
-        $table,
+        $table
     );
 
     if ($mode === COLUMN_EXPORT) {
