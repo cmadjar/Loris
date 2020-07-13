@@ -60,7 +60,6 @@ class Qc extends Endpoint implements \LORIS\Middleware\ETagCalculator
     {
         return array(
             'GET',
-            'PUT',
         );
     }
 
@@ -92,9 +91,6 @@ class Qc extends Endpoint implements \LORIS\Middleware\ETagCalculator
             switch ($request->getMethod()) {
             case 'GET':
                 return $this->_handleGET($request);
-
-            case 'PUT':
-                return $this->_handlePUT($request);
 
             case 'OPTIONS':
                 return (new \LORIS\Http\Response())
@@ -130,75 +126,6 @@ class Qc extends Endpoint implements \LORIS\Middleware\ETagCalculator
         $this->_cache = new \LORIS\Http\Response\JsonResponse($view);
 
         return $this->_cache;
-    }
-
-    /**
-     * Sets new value for this session imaging qc.
-     *
-     * @param ServerRequestInterface $request The incoming PSR7 request
-     *
-     * @return ResponseInterface The outgoing PSR7 response
-     */
-    private function _handlePUT(ServerRequestInterface $request): ResponseInterface
-    {
-        $data = json_decode((string) $request->getBody(), true);
-
-        $requiredfields = array(
-            'Meta',
-            'SessionQC',
-            'Pending',
-        );
-        $diff           = array_diff($requiredfields, array_keys($data));
-        if (!empty($diff)) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'Field(s) missing: ' . implode(', ', $diff)
-            );
-        }
-
-        try {
-            $candid = new CandID($data['Meta']['CandID']);
-        } catch(\DomainException $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'CandID is invalid'
-            );
-        }
-
-        if ($candid != $this->_visit->getCandID()) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'Candidate from URL does not match metadata'
-            );
-        }
-
-        $visitlabel = $data['Meta']['Visit'] ?? null;
-        if ($visitlabel !== $this->_visit->getVisitLabel()) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'Visit from URL does not match metadata'
-            );
-        }
-
-        $qcstatus  = $data['SessionQC'];
-        $ispending = $data['Pending'] ? 'Y' : 'N';
-
-        try {
-            $this->_visit->setData(array('MRIQCStatus' => $qcstatus));
-        } catch (\DatabaseException $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'MRIQCStatus value not acceptable'
-            );
-        }
-
-        try {
-            $this->_visit->setData(array('MRIQCPending' => $ispending));
-        } catch (\DatabaseException $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'MRIQCPending value not acceptable'
-            );
-        }
-
-        $link = '/' . $request->getUri()->getPath();
-        return (new \LORIS\Http\Response())
-            ->withStatus(204)
-            ->withHeader('Content-Location', $link);
     }
 
     /**

@@ -59,7 +59,6 @@ class Candidates extends Endpoint implements \LORIS\Middleware\ETagCalculator
     {
         return array(
             'GET',
-            'POST',
         );
     }
 
@@ -101,9 +100,6 @@ class Candidates extends Endpoint implements \LORIS\Middleware\ETagCalculator
             switch ($request->getMethod()) {
             case 'GET':
                 return $this->_handleGET($request);
-
-            case 'POST':
-                return $this->_handlePOST($request);
 
             case 'OPTIONS':
                 return (new \LORIS\Http\Response())
@@ -162,68 +158,6 @@ class Candidates extends Endpoint implements \LORIS\Middleware\ETagCalculator
         );
 
         return $this->_cache;
-    }
-
-    /**
-     * Create a candidate with the provided data
-     *
-     * @param ServerRequestInterface $request The incoming PSR7 request
-     *
-     * @return ResponseInterface
-     */
-    private function _handlePOST(ServerRequestInterface $request): ResponseInterface
-    {
-        $user = $request->getAttribute('user');
-        $data = json_decode((string) $request->getBody(), true);
-
-        if (!isset($data['Candidate'])) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'There is no Candidate object in the POST data'
-            );
-        }
-
-        $usersites = $user->getSiteNames();
-        if (!in_array($data['Candidate']['Site'], $usersites)) {
-            return new \LORIS\Http\Response\JSON\Forbidden(
-                'You are not affiliated with the candidate`s site'
-            );
-        }
-
-        $projectname = $data['Candidate']['Project'] ?? '';
-        try {
-            $project = \NDB_Factory::singleton()->project($projectname);
-        } catch (\NotFound $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest($e->getMessage());
-        }
-
-        $centerid = array_search(
-            $data['Candidate']['Site'],
-            \Utility::getSiteList()
-        );
-
-        $pscid = $data['Candidate']['PSCID'] ?? null;
-
-        try {
-            $candid = \Candidate::createNew(
-                $centerid,
-                $data['Candidate']['DoB'],
-                $data['Candidate']['EDC'],
-                $data['Candidate']['Sex'],
-                $pscid,
-                $project->getId()
-            );
-        } catch (\LorisException $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest($e->getMessage());
-        }
-
-        $candidate = \NDB_Factory::singleton()->candidate($candid);
-
-        $body = (new \LORIS\api\Views\Candidate($candidate))->toArray()['Meta'];
-        $link = '/'. $request->getURI()->getPath() . '/' . $candid;
-
-        return (new \LORIS\Http\Response\JsonResponse($body))
-            ->withStatus(201)
-            ->withHeader('Content-Location', $link);
     }
 
     /**

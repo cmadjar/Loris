@@ -63,7 +63,6 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
     {
         return array(
             'GET',
-            'PUT',
         );
     }
 
@@ -93,9 +92,6 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
             switch ($request->getMethod()) {
             case 'GET':
                 return $this->_handleGET($request);
-
-            case 'PUT':
-                return $this->_handlePUT($request);
 
             case 'OPTIONS':
                 return (new \LORIS\Http\Response())
@@ -161,130 +157,6 @@ class Visit extends Endpoint implements \LORIS\Middleware\ETagCalculator
             (new \LORIS\api\Views\Visit($this->_visit))
                 ->toArray()
         );
-    }
-
-    /**
-     * Handles a PUT request that creates or replace a candidate visit
-     *
-     * TODO: There is no way to validate the the visit_label in the url
-     *       fits the json data of the request because it is removed from the
-     *       pathparts in the calling class. The correct way to do it would be
-     *       to pass a "light" timepoint class that contains the visit_label but
-     *       no sessionid in the constructor.
-     *
-     * @param ServerRequestInterface $request The incoming PSR7 request
-     *
-     * @return ResponseInterface The outgoing PSR7 response
-     */
-    private function _handlePUT(ServerRequestInterface $request): ResponseInterface
-    {
-        $user      = $request->getAttribute('user');
-        $data      = json_decode((string) $request->getBody(), true);
-        $visitinfo = $data ?? array();
-
-        $requiredfields = array(
-            'CandID',
-            'Visit',
-            'Site',
-            'Battery',
-            'Project',
-        );
-        $diff           = array_diff($requiredfields, array_keys($visitinfo));
-        if (!empty($diff)) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'Field(s) missing: ' . implode(', ', $diff)
-            );
-        }
-
-        try {
-            $project = \NDB_Factory::singleton()->project($visitinfo['Project']);
-        } catch (\NotFound $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                $e->getMessage()
-            );
-        }
-
-        if ($visitinfo['CandID'] !== $this->_candidate->getCandID()) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                'CandID do not match this candidate'
-            );
-        }
-
-        $sessionid = array_search(
-            $visitinfo['Visit'],
-            $this->_candidate->getListOfVisitLabels()
-        );
-
-        $centerid = array_search($visitinfo['Site'], \Utility::getSiteList());
-
-        if (!in_array($centerid, $user->getCenterIDs())) {
-            return new \LORIS\Http\Response\JSON\Forbidden(
-                'You can`t create candidates visit for that site'
-            );
-        }
-
-        $subprojectid = array_search(
-            $visitinfo['Battery'],
-            \Utility::getSubprojectList()
-        );
-
-        if ($sessionid !== false) {
-            // If the visit label already exists for that candidate
-            $timepoint = \NDB_Factory::singleton()->timepoint($sessionid);
-            if ($timepoint->getCurrentStage() !== 'Not Started') {
-                return new \LORIS\Http\Response\JSON\Conflict(
-                    'This visit is already started'
-                );
-            }
-
-            $username = $user->getUsername();
-            $today    = date("Y-m-d");
-
-            $timepoint->setData(
-                array(
-                    'CenterID'        => $centerid,
-                    'Visit_label'     => $visitinfo['Visit'],
-                    'SubprojectID'    => $subprojectid,
-                    'Active'          => 'Y',
-                    'Date_active'     => $today,
-                    'RegisteredBy'    => $username,
-                    'UserID'          => $username,
-                    'Date_registered' => $today,
-                    'Testdate'        => $today,
-                    'ProjectID'       => $project->getId(),
-                )
-            );
-
-            $link = '/' . $request->getUri()->getPath();
-            return (new \LORIS\Http\Response())
-                ->withStatus(204)
-                ->withHeader('Content-Location', $link);
-        }
-
-        try {
-            \TimePoint::isValidVisitLabel(
-                new CandID($visitinfo['CandID']),
-                $subprojectid,
-                $visitinfo['Visit']
-            );
-        } catch (\LorisException $e) {
-            return new \LORIS\Http\Response\JSON\BadRequest(
-                $e->getMessage()
-            );
-        }
-
-        \TimePoint::createNew(
-            $this->_candidate,
-            $subprojectid,
-            $visitinfo['Visit'],
-            \Site::singleton($centerid),
-            $project
-        );
-
-        $link = '/' . $request->getUri()->getPath();
-        return (new \LORIS\Http\Response())
-            ->withStatus(201)
-            ->withHeader('Content-Location', $link);
     }
 
     /**

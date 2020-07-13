@@ -62,8 +62,6 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
     {
         return array(
             'GET',
-            'PUT',
-            'PATCH',
         );
     }
 
@@ -93,11 +91,6 @@ class Flags extends Endpoint implements \LORIS\Middleware\ETagCalculator
         switch ($request->getMethod()) {
         case 'GET':
             return $this->_handleGET($request);
-
-        case 'PUT':
-        case 'PATCH':
-            // TODO :: I don`t think this was working in v0.0.3
-            return new \LORIS\Http\Response\JSON\NotImplemented();
 
         case 'OPTIONS':
             return (new \LORIS\Http\Response())
