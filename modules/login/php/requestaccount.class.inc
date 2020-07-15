@@ -62,14 +62,14 @@ class RequestAccount extends \NDB_Form
 
         //merging array using + sign to avoid reindexing of keys which
         //occurs when array_merge() is used
-        $this->addSelect(
-            "site",
-            "Site",
-            array("" => "Choose your site:") + \Utility::getSiteList(),
-            array("required" => true)
-        );
-        $this->addCheckbox("examiner", "Examiner role", array());
-        $this->addCheckbox("radiologist", "Radiologist", array());
+//        $this->addSelect(
+//            "site",
+//            "Site",
+//            array("" => "Choose your site:") + \Utility::getSiteList(),
+//            array("required" => true)
+//        );
+//        $this->addCheckbox("examiner", "Examiner role", array());
+//        $this->addCheckbox("radiologist", "Radiologist", array());
 
         // Get reCATPCHA keys
         $reCAPTCHAPrivate = $config->getSetting('reCAPTCHAPrivate');
@@ -109,9 +109,9 @@ class RequestAccount extends \NDB_Form
             $errors['from'] = 'Please provide a valid email!';
         }
 
-        if (empty($values['site'])) {
-            $errors['site'] = "Please choose a site!";
-        }
+//        if (empty($values['site'])) {
+//            $errors['site'] = "Please choose a site!";
+//        }
 
         // I don't think this is required because insert uses prepared statements,
         // but I'm keeping it for now because it doesn't do any harm (unlike the
@@ -146,7 +146,7 @@ class RequestAccount extends \NDB_Form
         $name     = htmlspecialchars($_REQUEST["firstname"], ENT_QUOTES);
         $lastname = htmlspecialchars($_REQUEST["lastname"], ENT_QUOTES);
         $from     = htmlspecialchars($_REQUEST["from"], ENT_QUOTES);
-        $site     = $_REQUEST["site"];
+        $site     = 1;
         $fullname = $name." ".$lastname;
 
         $vals = array(
@@ -234,6 +234,45 @@ class RequestAccount extends \NDB_Form
         }
         // Show success message even if email already exists for security reasons
         $this->tpl_data['success'] = true;
+
+
+        // Send an email to all users meeting the following criteria:
+        //     - Associated with the Site
+        //     - Associated with the Project
+        //     - Have the User Management permission
+        $query  = "
+        SELECT DISTINCT u.Email,u.userID
+        FROM users u
+            JOIN user_psc_rel upr
+                ON u.ID = upr.UserID
+        WHERE upr.CenterID=:center";
+        $result = $DB->pselect(
+            $query,
+            ['center' => $site]
+        );
+        foreach ($result as $row) {
+            $hasPermission = \User::factory($row['userID'])
+                ->hasAnyPermission(
+                    ['user_accounts', 'user_accounts_multisite']
+                );
+            if ($hasPermission === false) {
+                continue;
+            }
+
+            // Send email to users with User Management permissions.
+            $studyName = 'Phantom production';
+
+            \Email::send(
+                $row['Email'],
+                'request_account.tpl',
+                [
+                    'Study'     => $studyName,
+                    'UserID'    => $from,
+                    'Real_name' => $fullname,
+                    'Email'     => $from,
+                ]
+            );
+        }
     }
 }
 
