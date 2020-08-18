@@ -91,10 +91,10 @@ if ($mode !== COLUMN_EXPORT
 // Create default output path. This value will be overwritten below if a user
 // specifies a custom path.
 // e.g. /var/www/loris/project/data_export/
-$filepath = $config->getSetting('base') . OUTPUT_FOLDER;
+$filepath =  OUTPUT_FOLDER;
 
 $query  = '';
-$params = array();
+$params = [];
 
 if ($mode === VISIT_EXPORT) {
     $cutoffDate = $argv[2];
@@ -106,7 +106,7 @@ if ($mode === VISIT_EXPORT) {
     // All date/dateime fields are excluded from the query as they are potentially
     // identifying. Visit statuses reflecting a Failure, Withdrawal, or
     // Recycling Bin are also excluded.
-    $sessionColumns = array(
+    $sessionColumns = [
         'CenterID',
         'VisitNo',
         'Visit_label',
@@ -126,7 +126,7 @@ if ($mode === VISIT_EXPORT) {
         'MRIQCStatus',
         'MRIQCPending',
         'MRICaveat'
-    );
+    ];
 
     // Build query information
 
@@ -146,7 +146,7 @@ if ($mode === VISIT_EXPORT) {
         "AND Current_stage != 'Recycling Bin' " .
         "AND DATE(Date_visit) < :cutoffDate";
 
-    $params = array('cutoffDate' => $cutoffDate);
+    $params = ['cutoffDate' => $cutoffDate];
 
     // Prepend PSCID to the array column headers so that it will be properly
     // marked in the CSV output.
@@ -184,18 +184,18 @@ if ($mode === VISIT_EXPORT) {
     // Format of output filename: <table_column_dataExtract_output.csv>
     $filename = sprintf(
         "%s_dataExtract_output.csv",
-        $table,
+        $table
     );
 
     if ($mode === COLUMN_EXPORT) {
         // Create an array containing 'PSCID' and the column names from the
         // command line input. Then join them as a comma-separated string (to be
         // written as the headers to the CSV file).
-        $headers = array_merge(array('PSCID'), explode(',', $column));
+        $headers = array_merge(['PSCID'], explode(',', $column));
 
         // Build basic SQL query info.
         $query  = "SELECT PSCID,$column from $table";
-        $params = array();
+        $params = [];
     } else if ($mode === INSTRUMENT_EXPORT) {
         // Query whether a tabel has the `Date taken` column.
         // If so we
@@ -204,7 +204,7 @@ if ($mode === VISIT_EXPORT) {
         // If not, then the table is not an instrument table so the script exits.
         $result = $DB->pselect(
             "SHOW COLUMNS FROM $table LIKE 'Date_taken'",
-            array()
+            []
         );
         if (empty($result)) {
             die("Table $table is does not contain instrument information.\n");
@@ -225,8 +225,8 @@ FROM candidate c
 INNER JOIN session s ON c.CandID = s.CandID
 INNER JOIN flag f ON f.SessionID = s.ID
 INNER JOIN $table t ON t.CommentID = f.CommentID
-WHERE DATE(t.Date_taken) < :cutoffDate " .
-'AND f.CommentID NOT LIKE "DDE%"';
+WHERE DATE(t.Date_taken) < :cutoffDate 
+AND f.CommentID NOT LIKE "DDE%";
 QUERY;
 
         $params['cutoffDate'] = $cutoffDate;
@@ -234,7 +234,7 @@ QUERY;
         // Prepend PSCID and Visit_label to the CSV headers so that they will
         // be recorded properly in the output
         $headers = array_merge(
-            array('PSCID', 'Visit_label', 'Data_entry', 'Administration'),
+            ['PSCID', 'Visit_label', 'Data_entry', 'Administration'],
             $headers
         );
     }
@@ -311,7 +311,7 @@ function writeToCsv(SplFileInfo $file, array $headers, array $data): void
  */
 function prependTableAbbreviation(array $columnNames, string $prefix): array
 {
-    $result = array();
+    $result = [];
     foreach ($columnNames as $column) {
         $result[] = "$prefix.$column";
     }

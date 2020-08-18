@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-require_once 'generic_includes.php';
+require_once '../generic_includes.php';
 require_once 'CandidateImporter.php';
 require_once 'VisitImporter.php';
 require_once 'InstrumentImporter.php';
@@ -86,33 +86,33 @@ $dataFile    = new SplFileInfo($argv[DATA_ARG_INDEX]);
 $excludedFile = $argv[EXCLUDED_ARG_INDEX] ?? null;
 
 switch ($mode) {
-    case CANDIDATE_IMPORT:
-        validateFilename($dataFile->getBasename(), 'candidate');
-        $importer = new CandidateImporter($mappingFile, $dataFile);
-        break;
-    case VISIT_IMPORT:
-        validateFilename($dataFile->getBasename(), 'visits');
-        if (is_null($excludedFile)) {
-            $importer = new VisitImporter($mappingFile, $dataFile);
-        } else {
-            $importer = new VisitImporter(
-                $mappingFile,
-                $dataFile,
-                new SplFileInfo($excludedFile)
-            );
-        }
-        break;
-    case INSTRUMENT_IMPORT:
-        $importer = new InstrumentImporter($mappingFile, $dataFile);
-        break;
+case CANDIDATE_IMPORT:
+    validateFilename($dataFile->getBasename(), 'candidate');
+    $importer = new CandidateImporter($mappingFile, $dataFile);
+    break;
+case VISIT_IMPORT:
+    validateFilename($dataFile->getBasename(), 'visits');
+    if (is_null($excludedFile)) {
+        $importer = new VisitImporter($mappingFile, $dataFile);
+    } else {
+        $importer = new VisitImporter(
+            $mappingFile,
+            $dataFile,
+            new SplFileInfo($excludedFile)
+        );
+    }
+    break;
+case INSTRUMENT_IMPORT:
+    $importer = new InstrumentImporter($mappingFile, $dataFile);
+    break;
 }
 
 
 $importer->processData();
-if (!$importer->hasSharedCandidates()) {
+if (!$importer->sharedCandidates) {
     die("The mapping file and data file have no candidates in common.\n");
 }
-echo "{$importer->hasSharedCandidates()} candidates found.\n";
+echo count($importer->sharedCandidates) . " candidates found.\n";
 
 $skippedCount = count($importer->candidatesSkipped);
 if ($skippedCount > 0) {
@@ -124,7 +124,7 @@ if ($skippedCount > 0) {
 }
 
 // Write the report to file.
-$path = $config->getSetting('base') . 'project/data_import/';
+$path = '/var/www/loris/project/data_import/';
 if (!is_dir($path)) {
     mkdir($path);
 }
