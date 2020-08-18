@@ -12,7 +12,7 @@
                     <p class="project-description">
                         <p>PREVENT-AD open data are accessible via this LORIS web browser, and also available for mass download using the LORIS API (see the link below for data download instructions).</p>
 
-                        <p>The first release includes longitudinal data from 232 participants either in the observational cohort or from INTREPAD, the main clinical trial. INTREPAD (<b>I</b>nvestigation of <b>N</b>aproxen as a <b>TRE</b>atment for <b>P</b>revention of <b>A</b>lzheimer’s <b>D</b>isease) is a double-blind, placebo controlled, randomized trial of naproxen sodium 220 mg or placebo twice daily.</p>
+                        <p>The first release includes longitudinal data from 308 participants either in the observational cohort or from INTREPAD, the main clinical trial. INTREPAD (<b>I</b>nvestigation of <b>N</b>aproxen as a <b>TRE</b>atment for <b>P</b>revention of <b>A</b>lzheimer’s <b>D</b>isease) is a double-blind, placebo controlled, randomized trial of naproxen sodium 220 mg or placebo twice daily.</p>
 
                         <p>Available data includes structural and functional Magnetic Resonance Imaging (MRI), and basic demographics (age at MRI, Gender, Study language, Handedness).</p>
                     </p>
@@ -21,9 +21,9 @@
             <!-- Only add the welcome panel footer if there are links -->
             {if $dashboard_links neq ""}
                 <div class="panel-footer">|
-                    <a href="https://douglas.research.mcgill.ca/stop-ad-centre" target="">StoP-AD Centre</a>
+                    <a href="https://douglas.research.mcgill.ca/stop-ad-centre" target="_blank">StoP-AD Centre</a>
                     |
-                    <a href="https://prevent-alzheimer.net/" target="">PREVENT-AD</a>
+                    <a href="https://prevent-alzheimer.net/" target="_blank">PREVENT-AD</a>
                     |
                     <a href="https://openpreventad.loris.ca/document_repository/ajax/GetFile.php?File=admin%2FHow%20to%20get%20the%20data.pdf">How to download data</a>
                     |
