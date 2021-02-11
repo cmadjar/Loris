@@ -46,7 +46,7 @@ class Candidate extends \Loris\API\APIBase
         parent::__construct($method);
 
         try {
-            $this->CandID    = $CandID;
+            $this->CandID    = new CandID($CandID);
             $this->Candidate = $this->Factory->Candidate($CandID);
         } catch (\DomainException $e) {
             $this->header("HTTP/1.1 400 Bad Request");
