@@ -104,16 +104,16 @@ abstract class APIBase
             $this->handleGET();
             break;
         case 'PUT':
-            $this->handlePUT();
+//            $this->handlePUT();
             break;
         case 'POST':
-            $this->handlePOST();
+//            $this->handlePOST();
             break;
         case 'OPTIONS':
-            $this->handleOPTIONS();
+//            $this->handleOPTIONS();
             break;
         case 'PATCH':
-            $this->handlePATCH();
+//            $this->handlePATCH();
             break;
 
         }
