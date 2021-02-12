@@ -51,9 +51,6 @@ class InstrumentData extends \Loris\API\Candidates\Candidate\Instruments
         if (empty($this->AllowedMethods)) {
             $this->AllowedMethods = [
                                      'GET',
-                                     'PUT',
-                                     'PATCH',
-                                     'OPTIONS',
                                     ];
         }
         $this->AutoHandleRequestDelegation = false;
@@ -146,87 +143,6 @@ class InstrumentData extends \Loris\API\Candidates\Candidate\Instruments
             $this->JSON['Flags'] = $flags;
         }
     }
-
-    /**
-     * Handle an OPTIONS request
-     *
-     * @return void but modifies HTTP headers sent
-     */
-    function handleOPTIONS()
-    {
-        $this->Header(
-            "Access-Control-Allow-Methods: ".
-            join(",", $this->AllowedMethods)
-        );
-    }
-
-    /**
-     * Handle a PUT request
-     *
-     * @return void but populates $this->JSON and writes to database
-     */
-    function handlePUT()
-    {
-        $fp   = fopen("php://input", "r");
-        $data = '';
-        while (!feof($fp)) {
-            $data .= fread($fp, 1024);
-        }
-        fclose($fp);
-
-        $data            = json_decode($data);
-        $instrument_name = $this->Instrument->testName;
-
-        if ($this->Instrument->validate($data)) {
-            $this->Instrument->clearInstrument();
-            $this->Instrument->_save($data->${instrument_name});
-            $this->JSON = array("success" => "Updated");
-        } else {
-            $this->Header("HTTP/1.1 403 Forbidden");
-            if (!$this->Instrument->determineDataEntryAllowed()) {
-                $msg = "Can not update instruments that"
-                       . " are flagged as complete";
-
-                $this->JSON = array('error' => $msg);
-            } else {
-                $this->JSON = array("error" => "Could not update.");
-            }
-        }
-    }
-
-    /**
-     * Handle a PUT request
-     *
-     * @return void but populates $this->JSON and writes to database
-     */
-    function handlePATCH()
-    {
-        $fp   = fopen("php://input", "r");
-        $data = '';
-        while (!feof($fp)) {
-            $data .= fread($fp, 1024);
-        }
-        fclose($fp);
-
-        $data            = json_decode($data);
-        $instrument_name = $this->Instrument->testName;
-
-        if ($this->Instrument->validate($data)) {
-            $this->Instrument->_save($data->${instrument_name});
-            $this->JSON = array("success" => "Updated");
-        } else {
-            $this->Header("HTTP/1.1 403 Forbidden");
-            if (!$this->Instrument->determineDataEntryAllowed()) {
-                $msg = "Can not update instruments that"
-                       . " are flagged as complete";
-
-                $this->JSON = array('error' => $msg);
-            } else {
-                $this->JSON = array("error" => "Could not update.");
-            }
-        }
-    }
-
 }
 
 if (isset($_REQUEST['PrintInstrumentData'])) {
