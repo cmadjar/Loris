@@ -79,7 +79,6 @@ class Candidate extends \Loris\API\APIBase
                                     'Project' => $this->Candidate->getProjectTitle(),
                                     'PSCID'   => $this->Candidate->getPSCID(),
                                     'Site'    => $Site,
-                                    'DoB'     => $this->Candidate->getCandidateDoB(),
                                     'Sex'     => $Sex,
                                    ],
                        "Visits" => array_values(
