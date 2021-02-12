@@ -96,12 +96,23 @@ class Visit extends \Loris\API\Candidates\Candidate
         );
         $centerName   = $center['Name'];
 
+	$dob        = $this->Candidate->getCandidateDoB($this->CandID);
+	$date_visit = $this->Timepoint->getDateOfVisit();
+	
+	if ($dob) {
+            $age_diff  = date_diff(date_create($date_visit), date_create($DoB));
+            $this->Age = $age_diff->format('%y') * 12 + $age_diff->format('%m');   
+        } else {
+            $this->Age = Null;
+        }
+
         $this->JSON = [
                        "Meta" => [
                                   "CandID"  => $this->CandID,
                                   'Visit'   => $this->VisitLabel,
                                   'Site'    => $centerName,
                                   'Battery' => $SubProjTitle,
+                                  'CandidateAgeInMonths' => $this->Age,
                                  ],
                       ];
         if ($this->Timepoint) {
@@ -137,6 +148,7 @@ class Visit extends \Loris\API\Candidates\Candidate
         }
     }
 
+}
 
 if (isset($_REQUEST['PrintVisit'])) {
     $InputDataArray = file_get_contents("php://input");
