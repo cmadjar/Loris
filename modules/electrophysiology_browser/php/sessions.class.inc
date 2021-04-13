@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This class features the code for the menu portion of the LORIS
  * electrophysiology browser module.
@@ -37,6 +36,7 @@ class Sessions extends \NDB_Page
     public $skipTemplate = true; // stops from looking for a smarty template
     protected $timepoint;
     protected $sessionID;
+    protected $candidate;
 
     /**
      * Determine whether the user has permission to view this page
@@ -47,11 +47,45 @@ class Sessions extends \NDB_Page
      */
     function _hasAccess(\User $user) : bool
     {
-        return ($user->hasPermission('electrophysiology_browser_view_allsites')
+        return (($user->hasPermission('electrophysiology_browser_view_allsites')
                 || ($user->hasCenter($this->timepoint->getCenterID())
-                && $user->hasPermission('electrophysiology_browser_view_site')
-            )
-        );
+                && $user->hasPermission('electrophysiology_browser_view_site'))));
+    }
+
+    /**
+     * Load the required variables in order to check that the  user
+     * has access to the session.
+     *
+     * @param \User                  $user    The user to load the resources for
+     * @param ServerRequestInterface $request The PSR15 Request being handled
+     *
+     * @throws \NotFound If the session id is non-numerical
+     * @throws \LorisException  If the session is not found
+     *
+     * @return void
+     */
+    public function loadResources(
+        \User $user, ServerRequestInterface $request
+    ) : void {
+
+        $path    = $request->getUri()->getPath();
+        $matches = [];
+
+        if (preg_match('#/sessions/(\d+)#', $path, $matches) !== 1) {
+            throw new \NotFound("Invalid session");
+        }
+        $session_id = intval($matches[1]);
+
+        try {
+            $this->timepoint = \NDB_Factory::singleton()->timepoint(
+                $session_id
+            );
+            $this->sessionID = $session_id;
+        } catch(\LorisException $e) {
+            throw new \NotFound("Session not found");
+        }
+
+        parent::loadResources($user, $request);
     }
 
     /**
@@ -63,34 +97,8 @@ class Sessions extends \NDB_Page
      */
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
-        $path       = $request->getUri()->getPath();
         $parameters = $request->getQueryParams();
         $user       = $request->getAttribute('user');
-
-        $matches = [];
-
-        // check that the session ID is of type integer
-        if (preg_match('#/sessions/(\d+)#', $path, $matches) !== 1) {
-            return (new \LORIS\Middleware\PageDecorationMiddleware($user))
-                ->process(
-                    $request,
-                    new \LORIS\Http\StringStream("Invalid session")
-                )->withStatus(404);
-        }
-
-        $session_id = intval($matches[1]);
-        try {
-            $this->timepoint = \NDB_Factory::singleton()->timepoint(
-                $session_id
-            );
-            $this->sessionID = $session_id;
-        } catch(\LorisException $e) {
-            return (new \LORIS\Middleware\PageDecorationMiddleware($user))
-                ->process(
-                    $request,
-                    new \LORIS\Http\StringStream("Session not found")
-                )->withStatus(404);
-        }
 
         if (!$this->_hasAccess($user)) {
             return (new \LORIS\Middleware\PageDecorationMiddleware($user))
@@ -111,7 +119,7 @@ class Sessions extends \NDB_Page
 
         if ($request->getMethod() != 'GET') {
             return (new \LORIS\Http\Response\JSON\MethodNotAllowed(
-                array('GET')
+                ['GET']
             ));
         }
 
@@ -143,22 +151,22 @@ class Sessions extends \NDB_Page
     {
         $db = \NDB_Factory::singleton()->database();
 
-        $query = 'SELECT 
-                DISTINCT(pf.SessionID) 
-              FROM physiological_file pf 
-                LEFT JOIN session s ON (s.ID=pf.SessionID) 
+        $query = 'SELECT
+                DISTINCT(pf.SessionID)
+              FROM physiological_file pf
+                LEFT JOIN session s ON (s.ID=pf.SessionID)
                 LEFT JOIN candidate c USING (CandID)
-                LEFT JOIN psc ON (s.CenterID=psc.CenterID) 
-                LEFT JOIN physiological_output_type pot 
-                  USING (PhysiologicalOutputTypeID) 
-              WHERE 
-                s.Active = "Y" 
-                AND pf.FileType IN ("bdf", "cnt", "edf", "set", "vhdr", "vsm") 
+                LEFT JOIN psc ON (s.CenterID=psc.CenterID)
+                LEFT JOIN physiological_output_type pot
+                  USING (PhysiologicalOutputTypeID)
+              WHERE
+                s.Active = "Y"
+                AND pf.FileType IN ("bdf", "cnt", "edf", "set", "vhdr", "vsm")
               ORDER BY pf.SessionID';
 
-        $response = array();
+        $response = [];
 
-        $sessions            = $db->pselect($query, array());
+        $sessions            = $db->pselect($query, []);
         $sessions            = array_column($sessions, 'SessionID');
         $response['patient'] = $this->getSubjectData($outputType);
         $response['database']    = array_values(
@@ -182,7 +190,7 @@ class Sessions extends \NDB_Page
      */
     function getSubjectData($outputType)
     {
-        $subjectData = array();
+        $subjectData = [];
         $candidate   = \NDB_Factory::singleton()->candidate(
             $this->timepoint->getCandID()
         );
@@ -213,13 +221,13 @@ class Sessions extends \NDB_Page
     {
         $db = \NDB_Factory::singleton()->database();
 
-        $fileCollection = array();
-        $params         = array();
+        $fileCollection = [];
+        $params         = [];
         $params['SID']  = $this->sessionID;
-        $query          = 'SELECT 
-                         pf.PhysiologicalFileID, 
-                         pf.FilePath 
-                       FROM 
+        $query          = 'SELECT
+                         pf.PhysiologicalFileID,
+                         pf.FilePath
+                       FROM
                          physiological_file pf ';
 
         if ($outputType != 'all_types') {
@@ -236,7 +244,7 @@ class Sessions extends \NDB_Page
         $physiologicalFiles = $db->pselect($query, $params);
 
         foreach ($physiologicalFiles as $file) {
-            $fileSummary         = array();
+            $fileSummary         = [];
             $physiologicalFileID = $file['PhysiologicalFileID'];
             $physiologicalFile   = $file['FilePath'];
             $physioFileObj       = new ElectrophysioFile(
@@ -269,22 +277,22 @@ class Sessions extends \NDB_Page
             $ecgChannelCount = $physioFileObj->getParameter('ECGChannelCount');
             $emgChannelCount = $physioFileObj->getParameter('EMGChannelCount');
 
-            $fileSummary['task']['channel'][] = array(
+            $fileSummary['task']['channel'][] = [
                 'name'  => 'EEG Channel Count',
                 'value' => $eegChannelCount,
-            );
-            $fileSummary['task']['channel'][] = array(
+            ];
+            $fileSummary['task']['channel'][] = [
                 'name'  => 'EOG Channel Count',
                 'value' => $eogChannelCount,
-            );
-            $fileSummary['task']['channel'][] = array(
+            ];
+            $fileSummary['task']['channel'][] = [
                 'name'  => 'ECG Channel Count',
                 'value' => $ecgChannelCount,
-            );
-            $fileSummary['task']['channel'][] = array(
+            ];
+            $fileSummary['task']['channel'][] = [
                 'name'  => 'EMG Channel Count',
                 'value' => $emgChannelCount,
-            );
+            ];
 
             // get the task reference
 
@@ -324,6 +332,9 @@ class Sessions extends \NDB_Page
             $artefactDesc     = $physioFileObj->getParameter(
                 'SubjectArtefactDescription'
             );
+            $chunksUrl        = $physioFileObj->getParameter(
+                'electrophyiology_chunked_dataset_path'
+            );
 
             $fileSummary['details']['task']['description']     = $taskDesc;
             $fileSummary['details']['instructions']            = $instructions;
@@ -354,7 +365,8 @@ class Sessions extends \NDB_Page
                 $physiologicalFile
             );
 
-            $fileSummary['downloads'] = $links;
+            $fileSummary['downloads']  = $links;
+            $fileSummary['chunks_url'] = $chunksUrl;
 
             $fileCollection[]['file'] = $fileSummary;
         }
@@ -377,13 +389,13 @@ class Sessions extends \NDB_Page
     {
         $db = \NDB_Factory::singleton()->database();
 
-        $params          = array();
+        $params          = [];
         $params['PFID']  = $physioFileID;
-        $downloadLinks   = array();
-        $downloadLinks[] = array(
+        $downloadLinks   = [];
+        $downloadLinks[] = [
             'type' => 'physiological_file',
             'file' => $physioFile,
-        );
+        ];
 
         $queries = [
             'physiological_electrode'  => 'physiological_electrode_file',
@@ -393,46 +405,46 @@ class Sessions extends \NDB_Page
         ];
 
         foreach ($queries as $query_key => $query_value) {
-            $query_statement = "SELECT 
+            $query_statement = "SELECT
                               DISTINCT(FilePath), '$query_value' AS FileType
-                            FROM 
-                              $query_key 
-                            WHERE 
+                            FROM
+                              $query_key
+                            WHERE
                               PhysiologicalFileID=:PFID";
             $query_statement = $db->pselectRow($query_statement, $params);
             if (isset($query_statement['FileType'])) {
-                $downloadLinks[] = array(
+                $downloadLinks[] = [
                     'type' => $query_statement['FileType'],
                     'file' => $query_statement['FilePath'],
-                );
+                ];
             } else {
-                $downloadLinks[] = array(
+                $downloadLinks[] = [
                     'type' => $query_value,
                     'file' => '',
-                );
+                ];
             }
         }
 
-        $queryFDT = "SELECT 
-                   Value AS FilePath, 
-                   'physiological_fdt_file' AS FileType 
-                 FROM 
-                   physiological_parameter_file 
-                   JOIN parameter_type AS pt USING (ParameterTypeID) 
-                 WHERE 
-                   pt.Name='fdt_file' 
+        $queryFDT = "SELECT
+                   Value AS FilePath,
+                   'physiological_fdt_file' AS FileType
+                 FROM
+                   physiological_parameter_file
+                   JOIN parameter_type AS pt USING (ParameterTypeID)
+                 WHERE
+                   pt.Name='fdt_file'
                    AND PhysiologicalFileID=:PFID";
         $queryFDT = $db->pselectRow($queryFDT, $params);
         if (isset($queryFDT['FileType'])) {
-            $downloadLinks[] = array(
+            $downloadLinks[] = [
                 'type' => $queryFDT['FileType'],
                 'file' => $queryFDT['FilePath'],
-            );
+            ];
         } else {
-            $downloadLinks[] = array(
+            $downloadLinks[] = [
                 'type' => 'physiological_fdt_file',
                 'file' => '',
-            );
+            ];
         }
 
         return $downloadLinks;
@@ -450,10 +462,30 @@ class Sessions extends \NDB_Page
         $baseurl = $factory->settings()->getBaseURL();
         $depends = array_merge(
             $depends,
-            array(
+            [
                 $baseurl
                 . '/electrophysiology_browser/js/electrophysiologySessionView.js',
-            )
+            ]
+        );
+        return $depends;
+    }
+
+    /**
+     * Get CSS Dependencies
+     *
+     * @return array
+     */
+    function getCSSDependencies()
+    {
+        $depends = parent::getCSSDependencies();
+        $factory = \NDB_Factory::singleton();
+        $baseurl = $factory->settings()->getBaseURL();
+        $depends = array_merge(
+            $depends,
+            [
+                $baseurl
+                . '/electrophysiology_browser/css/electrophysiology_browser.css',
+            ]
         );
         return $depends;
     }

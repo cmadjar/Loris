@@ -11,8 +11,16 @@ import PropTypes from 'prop-types';
 
 import StaticDataTable from 'jsx/StaticDataTable';
 import {FilePanel} from './components/electrophysiology_session_panels';
+import {SummaryPanel} from './components/electrophysiology_session_summary';
+import {DownloadPanel} from './components/DownloadPanel';
 import Sidebar from './components/Sidebar';
 import SidebarContent from './components/SidebarContent';
+import EEGLabSeriesProvider
+  from './react-series-data-viewer/src/eeglab/EEGLabSeriesProvider';
+import SeriesRenderer
+  from './react-series-data-viewer/src/series/components/SeriesRenderer';
+import EEGMontage
+  from './react-series-data-viewer/src/series/components/EEGMontage';
 
 /**
  * Electrophysiology Session View page
@@ -22,6 +30,10 @@ import SidebarContent from './components/SidebarContent';
  * @author Alizée Wickenheiser
  */
 class ElectrophysiologySessionView extends Component {
+  /**
+   * @constructor
+   * @param {object} props - React Component properties
+   */
   constructor(props) {
     super(props);
 
@@ -142,6 +154,9 @@ class ElectrophysiologySessionView extends Component {
               },
             ],
           },
+          chunkDirectoryURL: null,
+          epochsTableURL: null,
+          electrodesTableUrls: null,
         },
       ],
     };
@@ -179,32 +194,61 @@ class ElectrophysiologySessionView extends Component {
     const dataURL = loris.BaseURL + '/electrophysiology_browser/sessions/';
     const sessionID = this.props.sessionid;
     const outputTypeArg = '?outputType=' + this.state.url.params['outputType'];
-    return fetch(dataURL + sessionID + outputTypeArg, {credentials: 'same-origin'})
-      .then((resp) => {
+    return fetch(
+        dataURL + sessionID + outputTypeArg,
+        {credentials: 'same-origin'}
+      ).then((resp) => {
         if (!resp.ok) {
           throw Error(resp.statusText);
         }
         return resp.json();
       })
-      .then((data) => this.getState((appState) => {
-        appState.setup = {data};
-        appState.isLoaded = true;
-        appState.patient.info = data.patient;
-        let database = [];
-        for (let i = 0; i < data.database.length; i++) {
-          database.push(data.database[i]);
-        }
-        appState.database = database;
-        this.setState(appState);
-        document.getElementById('nav_next').href = dataURL + data.nextSession + outputTypeArg;
-        document.getElementById('nav_previous').href = dataURL + data.prevSession + outputTypeArg;
+      .then((data) => {
+        const database = data.database.map((dbEntry) => ({
+          ...dbEntry,
+          // EEG Visualisation urls
+          chunkDirectoryURL:
+            dbEntry
+            && dbEntry.file.chunks_url
+            && loris.BaseURL
+              + '/electrophysiology_browser/file_reader/?file='
+              + dbEntry.file.chunks_url,
+          epochsTableURL:
+            dbEntry
+            && dbEntry.file.downloads[3].file
+            && loris.BaseURL
+              + '/electrophysiology_browser/file_reader/?file='
+              + dbEntry.file.downloads[3].file,
+          electrodesTableUrls:
+            dbEntry
+            && dbEntry.file.downloads[1].file
+            && loris.BaseURL
+              + '/electrophysiology_browser/file_reader/?file='
+              + dbEntry.file.downloads[1].file,
+        }));
+
+        this.setState({
+            setup: {data},
+            isLoaded: true,
+            database: database,
+            patient: {
+                info: data.patient,
+            },
+        });
+
+        document.getElementById(
+          'nav_next'
+        ).href = dataURL + data.nextSession + outputTypeArg;
+        document.getElementById(
+          'nav_previous'
+        ).href = dataURL + data.prevSession + outputTypeArg;
         if (data.prevSession !== '') {
           document.getElementById('nav_previous').style.display = 'block';
         }
         if (data.nextSession !== '') {
           document.getElementById('nav_next').style.display = 'block';
         }
-      }))
+      })
       .catch((error) => {
         this.setState({error: true});
         console.error(error);
@@ -222,6 +266,11 @@ class ElectrophysiologySessionView extends Component {
     });
   }
 
+  /**
+   * Renders the React component.
+   *
+   * @return {JSX} - React markup for the component
+   */
   render() {
     if (!this.state.isLoaded) {
       return (
@@ -237,13 +286,43 @@ class ElectrophysiologySessionView extends Component {
     if (this.state.isLoaded) {
       let database = [];
       for (let i = 0; i < this.state.database.length; i++) {
+        const {
+          chunkDirectoryURL,
+          epochsTableURL,
+          electrodesTableUrls,
+        } = this.state.database[i];
         database.push(
-          <div>
+          <div key={i}>
             <FilePanel
               id={'filename_panel_' + i}
               title={this.state.database[i].file.name}
               data={this.state.database[i].file}
-            />
+            >
+              <div className="react-series-data-viewer-scoped col-xs-12">
+                <EEGLabSeriesProvider
+                  chunkDirectoryURLs={chunkDirectoryURL}
+                  epochsTableURLs={epochsTableURL}
+                  electrodesTableUrls={electrodesTableUrls}
+                >
+                  <SeriesRenderer />
+                  <div className='row'>
+                    <div className='col-sm-3'>
+                      <SummaryPanel
+                        data={this.state.database[i].file}
+                        id={'filename_summary_' + i}
+                      />
+                    </div>
+                    <EEGMontage />
+                    <div className='col-sm-4'>
+                      <DownloadPanel
+                        id={'file_download_' + i}
+                        data={this.state.database[i].file}
+                      />
+                    </div>
+                  </div>
+                </EEGLabSeriesProvider>
+              </div>
+            </FilePanel>
           </div>
         );
       }
@@ -276,9 +355,7 @@ class ElectrophysiologySessionView extends Component {
             freezeColumn='PSCID'
             Hide={{rowsPerPage: true, downloadCSV: true, defaultColumn: true}}
           />
-
           {database}
-
         </div>
       );
     }

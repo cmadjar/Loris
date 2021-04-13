@@ -35,8 +35,8 @@ class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance
     /**
      * Create a new ElectrophysiologyBrowserRow
      *
-     * @param array   $row The row (in the same format as \Database::pselectRow
-     *                     returns
+     * @param array   $row The row (in the same format as
+     *                     \Database::pselectRow returns
      * @param integer $cid The centerID affiliated with this row.
      * @param integer $pid The projectID affiliated with this row.
      */
