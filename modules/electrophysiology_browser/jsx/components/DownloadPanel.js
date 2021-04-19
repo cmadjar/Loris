@@ -51,7 +51,7 @@ class DownloadPanel extends Component {
               download.type != 'physiological_fdt_file'
             )
             .map((download, i) => {
-              const disabled = (download.file === '') ? true : false;
+              const disabled = (download.file === '');
               return (
                 <div
                   key={i}
@@ -72,7 +72,6 @@ class DownloadPanel extends Component {
                         style={{
                           color: '#b3b3b3',
                           cursor: 'not-allowed',
-                          borderRadius: '10px',
                           border: '1px solid #b3b3b3',
                           margin: 0,
                         }}
