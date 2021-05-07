@@ -26,7 +26,8 @@ namespace LORIS\electrophysiology_browser;
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
-class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance
+class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance //,
+//    \LORIS\StudyEntities\SiteHaver
 {
     protected $DBRow;
     protected $CenterID;
@@ -35,11 +36,12 @@ class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance
     /**
      * Create a new ElectrophysiologyBrowserRow
      *
-     * @param array   $row The row (in the same format as
-     *                     \Database::pselectRow returns
-     * @param integer $cid The centerID affiliated with this row.
-     * @param integer $pid The projectID affiliated with this row.
+     * @param array      $row The row (in the same format as
+     *                        \Database::pselectRow returns
+     * @param integer    $cid The centerID affiliated with this row.
+     * @param \ProjectID $pid The projectID affiliated with this row.
      */
+    // public function __construct(array $row, int $cid, \ProjectID $pid)
     public function __construct(array $row, int $cid, int $pid)
     {
         $this->DBRow     = $row;
@@ -50,8 +52,12 @@ class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance
     /**
      * Implements \LORIS\Data\DataInstance interface for this row.
      *
-     * @return string the row data.
+     * @return array which can be serialized by json_encode()
      */
+    // public function jsonSerialize() : array
+    // {
+    //     return $this->DBRow;
+    // }
     public function toJSON() : string
     {
         return json_encode($this->DBRow);
@@ -71,8 +77,9 @@ class ElectrophysiologyBrowserRow implements \LORIS\Data\DataInstance
     /**
      * Returns the ProjectID for this row
      *
-     * @return integer The ProjectID
+     * @return \ProjectID The ProjectID
      */
+    // public function getProjectID(): \ProjectID
     public function getProjectID(): int
     {
         return $this->ProjectID;

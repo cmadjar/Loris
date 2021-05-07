@@ -82,7 +82,10 @@ class EEGLabSeriesProvider extends Component {
             limit,
           })
         );
-        this.store.dispatch(setChannels(emptyChannels(this.props.limit, 1)));
+        this.store.dispatch(setChannels(emptyChannels(
+            Math.min(this.props.limit, channelMetadata.length),
+            1
+        )));
         this.store.dispatch(setDomain(timeInterval));
         this.store.dispatch(setInterval(timeInterval));
       }

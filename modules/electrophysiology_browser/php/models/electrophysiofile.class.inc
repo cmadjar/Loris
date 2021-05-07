@@ -86,8 +86,9 @@ class ElectrophysioFile implements \LORIS\Data\DataInstance
     /**
      * Implements \LORIS\Data\DataInstance interface
      *
-     * @return string 
+     * @return string which can be serialized by json_encode()
      */
+    //public function jsonSerialize() : string
     public function toJSON() : string
     {
         return '';

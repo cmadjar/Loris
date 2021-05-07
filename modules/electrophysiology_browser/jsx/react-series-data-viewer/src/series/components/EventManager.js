@@ -29,85 +29,83 @@ const EventManager = ({
   interval,
 }: Props) => {
   return (
-    <>
-      <div className="panel panel-primary event-list">
+    <div className="panel panel-primary event-list">
+      <div
+        className="panel-heading"
+        style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+      >
+        Events / Annotations
+        in timeline view
+        <i
+          className='glyphicon glyphicon-remove'
+          style={{cursor: 'pointer'}}
+          onClick={() => {
+            setRightPanel(null);
+          }}
+        ></i>
+      </div>
+      <div
+        className="panel-body"
+        style={{padding: 0}}
+      >
         <div
-          className="panel-heading"
+          className="list-group"
           style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
+            maxHeight: '540px',
+            overflowY: 'scroll',
+            marginBottom: 0,
+          }}
         >
-          Events/Annotations <br/>
-          in timeline view
-          <i
-            className='glyphicon glyphicon-remove'
-            style={{cursor: 'pointer'}}
-            onClick={() => {
-              setRightPanel(null);
-            }}
-          ></i>
-        </div>
-        <div
-          className="panel-body"
-          style={{padding: 0}}
-        >
-          <div
-            className="list-group"
-            style={{
-              maxHeight: '510px',
-              overflowY: 'scroll',
-              marginBottom: 0,
-            }}
-          >
-            {[...Array(epochs.length).keys()].filter((index) =>
-              epochs[index].onset + epochs[index].duration > interval[0]
-              && epochs[index].onset < interval[1]
-            ).map((index) => {
-              const epoch = epochs[index];
-              const visible = filteredEpochs.includes(index);
+          {[...Array(epochs.length).keys()].filter((index) =>
+            epochs[index].onset + epochs[index].duration > interval[0]
+            && epochs[index].onset < interval[1]
+          ).map((index) => {
+            const epoch = epochs[index];
+            const visible = filteredEpochs.includes(index);
 
-              return (
-                <div
-                  key={index}
-                  className={
-                    (epoch.type == 'Annotation' ? 'annotation ' : '')
-                    + 'list-group-item list-group-item-action'
-                  }
+            return (
+              <div
+                key={index}
+                className={
+                  (epoch.type == 'Annotation' ? 'annotation ' : '')
+                  + 'list-group-item list-group-item-action'
+                }
+                style={{
+                  position: 'relative',
+                }}
+              >
+                {epoch.label} <br/>
+                {epoch.onset}{epoch.duration > 0
+                && ' - ' + (epoch.onset + epoch.duration)}
+                <button
+                  type="button"
+                  className={(visible ? '' : 'active ')
+                    + 'btn btn-xs btn-primary'}
+                  onClick={() => toggleEpoch(index)}
+                  onMouseEnter={() => updateActiveEpoch(index)}
+                  onMouseLeave={() => updateActiveEpoch(null)}
                   style={{
-                    position: 'relative',
+                    position: 'absolute',
+                    right: '15px',
+                    top: '15px',
+                    display: 'block',
                   }}
                 >
-                  {epoch.label} <br/>
-                  {epoch.onset}{epoch.duration > 0
-                  && ' - ' + (epoch.onset + epoch.duration)}
-                  <button
-                    type="button"
-                    className={(visible ? '' : 'active ')
-                      + 'btn btn-xs btn-primary'}
-                    onClick={() => toggleEpoch(index)}
-                    onMouseEnter={() => updateActiveEpoch(index)}
-                    onMouseLeave={() => updateActiveEpoch(null)}
-                    style={{
-                      position: 'absolute',
-                      right: '15px',
-                      top: '15px',
-                      display: 'block',
-                    }}
-                  >
-                    <i className={
-                      'glyphicon glyphicon-eye-'
-                      + (visible ? 'open' : 'close')
-                    }></i>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                  <i className={
+                    'glyphicon glyphicon-eye-'
+                    + (visible ? 'open' : 'close')
+                  }></i>
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

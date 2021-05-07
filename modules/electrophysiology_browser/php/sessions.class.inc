@@ -47,9 +47,14 @@ class Sessions extends \NDB_Page
      */
     function _hasAccess(\User $user) : bool
     {
-        return (($user->hasPermission('electrophysiology_browser_view_allsites')
+        //return (($user->hasPermission('electrophysiology_browser_view_allsites')
+        //        || ($user->hasCenter($this->timepoint->getCenterID())
+        //        && $user->hasPermission('electrophysiology_browser_view_site'))
+        //    ) && $user->hasProject($this->timepoint->getProject()->getId()));
+
+	return ($user->hasPermission('electrophysiology_browser_view_allsites')
                 || ($user->hasCenter($this->timepoint->getCenterID())
-                && $user->hasPermission('electrophysiology_browser_view_site'))));
+                && $user->hasPermission('electrophysiology_browser_view_site')));
     }
 
     /**
@@ -78,7 +83,8 @@ class Sessions extends \NDB_Page
 
         try {
             $this->timepoint = \NDB_Factory::singleton()->timepoint(
-                $session_id
+                //new \SessionID(strval($session_id))
+		$session_id
             );
             $this->sessionID = $session_id;
         } catch(\LorisException $e) {
@@ -125,14 +131,14 @@ class Sessions extends \NDB_Page
 
         if (!isset($parameters['outputType'])) {
             return (new \LORIS\Http\Response\JSON\BadRequest(
-                'outputType required'
+                'OutputType required'
             ));
         }
 
         $outputType = $parameters['outputType'];
-        if (!in_array($outputType, ['raw', 'derivatives', 'all_types'])) {
+        if (!in_array($outputType, ['raw', 'derivative', 'all_types'])) {
             return (new \LORIS\Http\Response\JSON\BadRequest(
-                'invalid output type'
+                'Invalid output type'
             ));
         }
 
@@ -398,10 +404,11 @@ class Sessions extends \NDB_Page
         ];
 
         $queries = [
-            'physiological_electrode'  => 'physiological_electrode_file',
-            'physiological_channel'    => 'physiological_channel_file',
-            'physiological_task_event' => 'physiological_task_event_file',
-            'physiological_archive'    => 'all_files',
+            'physiological_electrode'          => 'physiological_electrode_file',
+            'physiological_channel'            => 'physiological_channel_file',
+            'physiological_task_event'         => 'physiological_task_event_file',
+           // 'physiological_annotation_archive' => 'physiological_annotation_files',
+            'physiological_archive'            => 'all_files',
         ];
 
         foreach ($queries as $query_key => $query_value) {
