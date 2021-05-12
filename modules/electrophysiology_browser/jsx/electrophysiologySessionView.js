@@ -224,11 +224,14 @@ class ElectrophysiologySessionView extends Component {
               + '/electrophysiology_browser/file_reader/?file='
               + dbEntry.file.downloads[3].file,
           electrodesTableUrls:
-            dbEntry
+            loris.BaseURL
+              + '/electrophysiology_browser/file_reader/?file='
+              + 'bids_imports/electrodes.tsv',
+            /* dbEntry
             && dbEntry.file.downloads[1].file
             && loris.BaseURL
               + '/electrophysiology_browser/file_reader/?file='
-              + dbEntry.file.downloads[1].file,
+              + dbEntry.file.downloads[1].file, */
         }));
 
         this.setState({
