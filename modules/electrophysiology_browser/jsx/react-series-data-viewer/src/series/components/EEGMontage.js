@@ -167,9 +167,9 @@ const EEGMontage = (
             transform='rotate(-90)'
             cx={point.x}
             cy={point.y}
-            r='8'
-            fill='white'
-            stroke={color}
+            r='4'
+            fillOpacity='0.3'
+            fill={color}
           >
             <title>{electrodes[i].name}</title>
           </circle>
@@ -187,7 +187,6 @@ const EEGMontage = (
             textAnchor="middle"
             fontSize="8px"
           >
-            {i + 1}
             <title>{electrodes[i].name}</title>
           </text>
         </Group>
