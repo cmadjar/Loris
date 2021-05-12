@@ -252,7 +252,7 @@ class Sessions extends \NDB_Page
             $fileSummary         = [];
             $physiologicalFileID = $file['PhysiologicalFileID'];
             $physiologicalFile   = $file['FilePath'];
-            $physioFileObj       = new \ElectrophysioFile(
+            $physioFileObj       = new ElectrophysioFile(
                 intval($physiologicalFileID)
             );
             $fileName            = basename(
