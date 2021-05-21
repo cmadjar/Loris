@@ -78,19 +78,19 @@ class Recording
                      LEFT JOIN (
                        SELECT PhysiologicalFileID, FilePath
                        FROM physiological_channel
-                       LIMIT 1
+                       GROUP BY (PhysiologicalFileID)
                      ) pc
                        ON (pc.PhysiologicalFileID = f.PhysiologicalFileID)
                      LEFT JOIN (
                        SELECT PhysiologicalFileID, FilePath
                        FROM physiological_electrode
-                       LIMIT 1
+                       GROUP BY (PhysiologicalFileID)
                      ) pe
                        ON (pe.PhysiologicalFileID = f.PhysiologicalFileID)
                      LEFT JOIN (
                        SELECT PhysiologicalFileID, FilePath
                        FROM physiological_task_event
-                       LIMIT 1
+                       GROUP BY (PhysiologicalFileID)
                      ) pte
                        ON (pte.PhysiologicalFileID = f.PhysiologicalFileID)
                      LEFT JOIN (
@@ -98,7 +98,6 @@ class Recording
                          FROM physiological_parameter_file pf
                          JOIN parameter_type pt ON (pf.ParameterTypeID=pt.ParameterTypeID)
                          WHERE pt.Name= "json_file"
-                         LIMIT 1
                      ) ppf
                        ON (ppf.PhysiologicalFileID = f.PhysiologicalFileID)
                      LEFT JOIN physiological_archive pa
