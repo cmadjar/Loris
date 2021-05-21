@@ -88,6 +88,9 @@ class BidsFile extends Endpoint
         case 'events':
             $handler = new BidsFile\Events($this->_recording);
             break;
+        case 'json':
+            $handler = new BidsFile\JsonFile($this->_recording);
+            break;
         case 'archive':
             $handler = new BidsFile\Archive($this->_recording);
             break;

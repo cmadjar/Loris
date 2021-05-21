@@ -49,7 +49,7 @@ class Recording
                 ->database()
                 ->pselectRow(
                     '
-                     SELECT
+                    SELECT
                        f.FilePath               as filelocation,
                        pot.OutputTypeName       as outputtype,
                        pm.PhysiologicalModality as acquisitionmodality,
@@ -59,6 +59,7 @@ class Recording
                        pc.FilePath              as channel_file_path,
                        pe.FilePath              as electrode_file_path,
                        pte.FilePath             as event_file_path,
+                       ppf.Value                as json_file_path,
                        pa.FilePath              as archive_file_path
                      FROM
                        physiological_file f
@@ -92,6 +93,14 @@ class Recording
                        LIMIT 1
                      ) pte
                        ON (pte.PhysiologicalFileID = f.PhysiologicalFileID)
+                     LEFT JOIN (
+                         SELECT PhysiologicalFileID, Value
+                         FROM physiological_parameter_file pf
+                         JOIN parameter_type pt ON (pf.ParameterTypeID=pt.ParameterTypeID)
+                         WHERE pt.Name= "json_file"
+                         LIMIT 1
+                     ) ppf
+                       ON (ppf.PhysiologicalFileID = f.PhysiologicalFileID)
                      LEFT JOIN physiological_archive pa
                        ON (pa.PhysiologicalFileID = f.PhysiologicalFileID)
                      WHERE f.PhysiologicalFileID = :v_fileid
@@ -113,6 +122,7 @@ class Recording
             $this->_electrode_file_path = $dbrow['electrode_file_path'];
             $this->_event_file_path     = $dbrow['event_file_path'];
             $this->_archive_file_path   = $dbrow['archive_file_path'];
+            $this->_json_file_path       = $dbrow['json_file_path'];
         }
     }
 
@@ -236,6 +246,24 @@ class Recording
 
         return $info;
     }
+
+    /**
+     * Return a SPLFileInfo object based on this json's file's properties.
+     *
+     * @return \SplFileInfo
+     */
+    public function getJsonFileInfo(): \SplFileInfo
+    {
+        $imagepath = \NDB_Factory::singleton()
+            ->config()
+            ->getSetting('imagePath');
+
+        $fullpath = $imagepath . $this->_json_file_path;
+
+        $info = new \SplFileInfo($fullpath);
+
+        return $info;
+}
 
     /**
      * Return a SPLFileInfo object based on this events.class' file's properties.

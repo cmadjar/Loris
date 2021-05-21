@@ -69,8 +69,7 @@ class Full
         unset($data['scans_tsv_file']);
         unset($data['physiological_scans_tsv_file_bake2hash']);
         unset($data['electrophyiology_chunked_dataset_path']);
-        unset($data['age_at_scan']);
-        
+
         return  array(
             'Meta' => $this->_formatMeta(),
             'Data' => $data,
