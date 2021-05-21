@@ -41,13 +41,17 @@ class ProjectRecordingsRowProvisioner extends DBRowProvisioner
              SELECT
                s.CandID as Candidate,
                c.PSCID as PSCID,
-               c.Entity_type as Entity_type, 
+               c.Entity_type as Entity_type,
                s.Visit_label as Visit,
                s.Date_visit as Visit_date,
                s.CenterID as CenterID,
                p.Name as Site,
-               f.FilePath as File,
                pm.PhysiologicalModality as Modality,
+               f.FilePath as RecordingFile,
+               pc.FilePath as ChannelFile,
+               pe.FilePath as ElectrodeFile,
+               pte.FilePath as EventFile,
+               ppf.Value as JsonFile,
                f.InsertTime as InsertTime
              FROM
                physiological_file f
@@ -61,6 +65,31 @@ class ProjectRecordingsRowProvisioner extends DBRowProvisioner
                ON (s.ProjectID = project.ProjectID)
              LEFT JOIN physiological_modality pm
                ON (pm.PhysiologicalModalityID = f.PhysiologicalModalityID)
+             LEFT JOIN (
+               SELECT PhysiologicalFileID, FilePath
+               FROM physiological_channel
+               GROUP BY (PhysiologicalFileID)
+             ) pc
+               ON (pc.PhysiologicalFileID = f.PhysiologicalFileID)
+             LEFT JOIN (
+               SELECT PhysiologicalFileID, FilePath
+               FROM physiological_electrode
+               GROUP BY (PhysiologicalFileID)
+             ) pe
+               ON (pe.PhysiologicalFileID = f.PhysiologicalFileID)
+             LEFT JOIN (
+               SELECT PhysiologicalFileID, FilePath
+               FROM physiological_task_event
+               GROUP BY (PhysiologicalFileID)
+             ) pte
+               ON (pte.PhysiologicalFileID = f.PhysiologicalFileID)
+             LEFT JOIN (
+                 SELECT PhysiologicalFileID, Value
+                 FROM physiological_parameter_file pf
+                 JOIN parameter_type pt ON (pf.ParameterTypeID=pt.ParameterTypeID)
+                 WHERE pt.Name= "json_file"
+             ) ppf
+               ON (ppf.PhysiologicalFileID = f.PhysiologicalFileID)
              WHERE
                c.Active = \'Y\' AND
                s.Active = \'Y\' AND

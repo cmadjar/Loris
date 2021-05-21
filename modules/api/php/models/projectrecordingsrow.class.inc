@@ -39,16 +39,20 @@ class ProjectRecordingsRow implements \LORIS\Data\DataInstance
      */
     public function __construct(array $row)
     {
-        $this->_candid     = $row['Candidate'] ?? null;
-        $this->_pscid      = $row['PSCID'] ?? null;
-        $this->_entitytype = $row['Entity_type'] ?? null;
-        $this->_visitlabel = $row['Visit'] ?? null;
-        $this->_visitdate  = $row['Visit_date'] ?? null;
-        $this->_centerid   = $row['CenterID'] ?? null;
-        $this->_centername = $row['Site'] ?? null;
-        $this->_filename   = $row['File'] ?? null;
-        $this->_modality   = $row['Modality'] ?? null;
-        $this->_inserttime = $row['InsertTime'] ?? null;
+        $this->_candid        = $row['Candidate'] ?? null;
+        $this->_pscid         = $row['PSCID'] ?? null;
+        $this->_entitytype    = $row['Entity_type'] ?? null;
+        $this->_visitlabel    = $row['Visit'] ?? null;
+        $this->_visitdate     = $row['Visit_date'] ?? null;
+        $this->_centerid      = $row['CenterID'] ?? null;
+        $this->_centername    = $row['Site'] ?? null;
+        $this->_modality      = $row['Modality'] ?? null;
+        $this->_filename      = $row['RecordingFile'] ?? null;
+        $this->_channelfile   = $row['ChannelFile'] ?? null;
+        $this->_electrodefile = $row['ElectrodeFile'] ?? null;
+        $this->_eventfile     = $row['EventFile'] ?? null;
+        $this->_jsonfile      = $row['JsonFile'] ?? null;
+        $this->_inserttime    = $row['InsertTime'] ?? null;
     }
 
     /**
@@ -59,21 +63,39 @@ class ProjectRecordingsRow implements \LORIS\Data\DataInstance
     public function toJSON() : string
     {
         $obj = array(
-            'Candidate'  => $this->_candid,
-            'PSCID'      => $this->_pscid,
-            'Visit'      => $this->_visitlabel,
-            'Visit_date' => $this->_visitdate,
-            'Site'       => $this->_centername,
-            'File'       => $this->_filename,
-            'Modality'   => $this->_modality,
-            'InsertTime' => $this->_inserttime,
+            'Candidate'     => $this->_candid,
+            'PSCID'         => $this->_pscid,
+            'Visit'         => $this->_visitlabel,
+            'Visit_date'    => $this->_visitdate,
+            'Site'          => $this->_centername,
+            'Modality'      => $this->_modality,
+            'InsertTime'    => $this->_inserttime,
         );
 
-        $filename = basename($obj['File']);
+        $filename = basename($this->_filename);
         $candid   = $obj['Candidate'];
         $visit    = $obj['Visit'];
 
-        $obj['Link'] = "/candidates/$candid/$visit/recordings/$filename";
+        # get the recording file link
+        $obj['RecordingFileLink'] = "/candidates/$candid/$visit/recordings/$filename";
+
+        # get the recording's associated BIDS files
+        $obj['ChannelsFileLink'] = (
+            $this->_channelfile ?
+            "/candidates/$candID/$visit/recordings/$filename/bidsfiles/channels" : null
+        );
+        $obj['ElectrodesFileLink'] = (
+        $this->_electrodefile ?
+            "/candidates/$candID/$visit/recordings/$filename/bidsfiles/electrodes" : null
+        );
+        $obj['EventsFileLink'] = (
+        $this->_eventfile ?
+            "/candidates/$candID/$visit/recordings/$filename/bidsfiles/events" : null
+        );
+        $obj['JSONFileLink'] = (
+        $this->_jsonfile ?
+            "/candidates/$candID/$visit/recordings/$filename/bidsfiles/json" : null
+        );
 
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
