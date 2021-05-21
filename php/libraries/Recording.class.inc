@@ -61,7 +61,7 @@ class Recording
                        pte.FilePath             as event_file_path,
                        pa.FilePath              as archive_file_path
                      FROM
-                       physiological_file f 
+                       physiological_file f
                      LEFT JOIN session s
                        ON (f.SessionID = s.ID)
                      LEFT JOIN candidate c
@@ -135,7 +135,7 @@ class Recording
                          physiological_parameter_file
                        WHERE
                          ParameterTypeID = (
-                           SELECT ParameterTypeID 
+                           SELECT ParameterTypeID
                            FROM parameter_type
                            WHERE Name = :v_headername
                          )
@@ -165,7 +165,7 @@ class Recording
                          pt.Name as name,
                          pf.Value as value
                        FROM
-                         physiological_parameter_file pf 
+                         physiological_parameter_file pf
                        JOIN parameter_type pt
                          USING (ParameterTypeID)
                        WHERE
@@ -301,10 +301,10 @@ class Recording
                          pc.Unit                as unit,
                          pc.FilePath            as filepath
                        FROM
-                         physiological_channel pc 
-                       JOIN physiological_channel_type pct
+                         physiological_channel pc
+                       LEFT JOIN physiological_channel_type pct
                          USING (PhysiologicalChannelTypeID)
-                       JOIN physiological_status_type pst
+                       LEFT JOIN physiological_status_type pst
                          USING (PhysiologicalStatusTypeID)
                        WHERE
                          pc.PhysiologicalFileID = :v_fileid
@@ -342,7 +342,7 @@ class Recording
                          pe.Impedance           as Impedance,
                          pe.FilePath            as filepath
                        FROM
-                         physiological_electrode pe 
+                         physiological_electrode pe
                        JOIN physiological_electrode_type pet
                          USING (PhysiologicalElectrodeTypeID)
                        JOIN physiological_electrode_material pem
@@ -383,7 +383,7 @@ class Recording
                          pte.ResponseTime as responsetime,
                          pte.FilePath     as filepath
                        FROM
-                         physiological_task_event pte 
+                         physiological_task_event pte
                        WHERE
                          pte.PhysiologicalFileID = :v_fileid
                       ',
