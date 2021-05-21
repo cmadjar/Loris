@@ -343,9 +343,9 @@ class Recording
                          pe.FilePath            as filepath
                        FROM
                          physiological_electrode pe
-                       JOIN physiological_electrode_type pet
+                       LEFT JOIN physiological_electrode_type pet
                          USING (PhysiologicalElectrodeTypeID)
-                       JOIN physiological_electrode_material pem
+                       LEFT JOIN physiological_electrode_material pem
                          USING (PhysiologicalElectrodeMaterialID)
                        WHERE
                          pe.PhysiologicalFileID = :v_fileid
