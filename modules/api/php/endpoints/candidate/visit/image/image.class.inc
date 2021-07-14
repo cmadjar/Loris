@@ -123,6 +123,9 @@ class Image extends Endpoint implements \LORIS\Middleware\ETagCalculator
         case 'qc':
             $handler = new Qc($this->_visit, $image);
             break;
+        case 'bidsfiles':
+            $handler = new BidsFile($image);
+            break;
         default:
             return new \LORIS\Http\Response\JSON\NotFound();
         }

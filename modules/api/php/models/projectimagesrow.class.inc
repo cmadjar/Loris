@@ -81,6 +81,11 @@ class ProjectImagesRow implements \LORIS\Data\DataInstance
         $obj['Link']       = "/candidates/$candid/$visit/images/$filename";
         $obj['InsertTime'] = date('c', (int) $obj['InsertTime']);
 
+        if (str_ends_with($filename, 'nii') or str_ends_with($filename, 'nii.gz')) {
+            $bids_subdir = basename(dirname($this->_filename));
+            $obj['BIDS_subdir'] = $bids_subdir;
+        }
+
         return json_encode($obj);
     }
 
