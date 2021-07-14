@@ -85,9 +85,6 @@ class BidsFile extends Endpoint
         case 'bvec':
             $handler = new BidsFile\Bvec($this->_image);
             break;
-        case 'events':
-            $handler = new BidsFile\Events($this->_image);
-            break;
         case 'json':
             $handler = new BidsFile\JsonFile($this->_image);
             break;
