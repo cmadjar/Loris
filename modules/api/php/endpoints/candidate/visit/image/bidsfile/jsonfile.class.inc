@@ -7,14 +7,14 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-namespace LORIS\api\Endpoints\Candidate\Visit\Electrophysiology\BidsFile;
+namespace LORIS\api\Endpoints\Candidate\Visit\Image\BidsFile;
 
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use \LORIS\api\Endpoint;
 
 /**
- * This class handles request to a recording's channels BIDS TSV file.
+ * This class handles request to a NIfTI image's JSON file.
  *
  * @category API
  * @package  LORIS
@@ -30,20 +30,20 @@ class JsonFile extends Endpoint implements \LORIS\Middleware\ETagCalculator
     private $_cache;
 
     /**
-     * The requested recording
+     * The requested image
      *
-     * @var \LORIS\Recording
+     * @var \LORIS\Image
      */
-    private $_recording;
+    private $_image;
 
     /**
      * Contructor
      *
-     * @param \LORIS\Recording $recording The requested recording
+     * @param \LORIS\Recording $image The requested recording
      */
-    public function __construct(\LORIS\Recording $recording)
+    public function __construct(\LORIS\Image $image)
     {
-        $this->_recording = $recording;
+        $this->_image = $image;
     }
 
     /**
@@ -107,7 +107,7 @@ class JsonFile extends Endpoint implements \LORIS\Middleware\ETagCalculator
             return $this->_cache;
         }
 
-        $info = $this->_recording->getJsonFileInfo();
+        $info = $this->_image->getJsonFileInfo();
 
         if (!$info->isFile() or !$info->isReadable()) {
             return new \LORIS\Http\Response\JSON\NotFound();
@@ -120,7 +120,7 @@ class JsonFile extends Endpoint implements \LORIS\Middleware\ETagCalculator
             $body,
             200,
             array(
-                'Content-Type'        => 'recording/json',
+                'Content-Type'        => 'image/json',
                 'Content-Disposition' => 'attachment; filename=' . $filename,
             )
         );

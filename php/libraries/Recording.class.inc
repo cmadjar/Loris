@@ -262,7 +262,7 @@ class Recording
         $info = new \SplFileInfo($fullpath);
 
         return $info;
-}
+    }
 
     /**
      * Return a SPLFileInfo object based on this events.class' file's properties.
