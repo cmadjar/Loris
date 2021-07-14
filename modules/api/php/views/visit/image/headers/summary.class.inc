@@ -88,6 +88,15 @@ class Summary
             $bids_subdir = basename($this->_image->getFileInfo()->getPath());
             $arr['BIDS_subdir'] = $bids_subdir;
         }
+        if ($this->_image->getJsonFileInfo()->isFile()) {
+            $arr['JSON_file_link'] =  "/candidates/$candid/$visitlabel/images/$filename/bidsfiles/json";
+        }
+        if ($this->_image->getBvalFileInfo()->isFile()) {
+            $arr['bval_file_link'] =  "/candidates/$candid/$visitlabel/images/$filename/bidsfiles/bval";
+        }
+        if ($this->_image->getBvecFileInfo()->isFile()) {
+            $arr['bvec_file_link'] =  "/candidates/$candid/$visitlabel/images/$filename/bidsfiles/bvec";
+        }
 
         return $arr;
     }
