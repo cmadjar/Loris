@@ -1095,7 +1095,7 @@ ImagePanel.propTypes = {
   HeadersExpanded: PropTypes.string,
   APIFile: PropTypes.string,
   CaveatViolationsResolvedID: PropTypes.string,
-  EditableCaveat: PropTypes.bool
+  EditableCaveat: PropTypes.bool,
 };
 
 let RImagePanel = React.createFactory(ImagePanel);
