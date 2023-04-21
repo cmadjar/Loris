@@ -494,12 +494,15 @@ class ImagePanelQCCaveatSelector extends Component {
     if (this.props.SeriesUID && this.props.Caveat === '1') {
         // If there is a manual caveat that was set, the link
         // will take you to it, even though there might also
-        // be a caveat that was set by the MRI piepline (i.e
+        // be a caveat that was set by the MRI pipeline (i.e
         // not manual). Note that manual caveat are always
         // resolved
         if (this.props.CaveatViolationsResolvedID) {
             mriViolationsLink = '/mri_violations/resolved_violations/?' +
               'SeriesUID=' + this.props.SeriesUID + '&filter=true';
+        } else {
+          mriViolationsLink = '/mri_violations/?MincFile=' +
+            'MincFile=' + this.props.Fullname + '&filter=true';
         }
     }
 
@@ -508,7 +511,7 @@ class ImagePanelQCCaveatSelector extends Component {
         Label="Caveat"
         FormName="caveat"
         FileID={this.props.FileID}
-        editable={this.props.HasQCPerm}
+        editable={this.props.HasQCPerm && this.props.EditableCaveat}
         options={
           {
             '': '',
@@ -528,6 +531,7 @@ ImagePanelQCCaveatSelector.propTypes = {
   SeriesUID: PropTypes.string,
   Caveat: PropTypes.string,
   CaveatViolationsResolvedID: PropTypes.string,
+  EditableCaveat: PropTypes.bool,
 };
 
 
@@ -606,6 +610,7 @@ class ImagePanelQCPanel extends Component {
           Caveat={this.props.Caveat}
           SeriesUID={this.props.SeriesUID}
           CaveatViolationsResolvedID={this.props.CaveatViolationsResolvedID}
+          EditableCaveat={this.props.EditableCaveat}
         />
         <ImagePanelQCSNRValue
           FileID={this.props.FileID}
@@ -625,6 +630,7 @@ ImagePanelQCPanel.propTypes = {
   SeriesUID: PropTypes.string,
   SNR: PropTypes.string,
   CaveatViolationsResolvedID: PropTypes.string,
+  EditableCaveat: PropTypes.bool,
 };
 
 
@@ -925,6 +931,7 @@ class ImagePanelBody extends Component {
               Selected={this.props.Selected}
               SNR={this.props.SNR}
               SeriesUID={this.props.SeriesUID}
+              EditableCaveat={this.props.EditableCaveat}
             />
           </div>
         </div>
@@ -969,6 +976,7 @@ ImagePanelBody.propTypes = {
   OtherTimepoints: PropTypes.string,
   HeadersExpanded: PropTypes.string,
   CaveatViolationsResolvedID: PropTypes.string,
+  EditableCaveat: PropTypes.bool,
 };
 
 
@@ -1044,6 +1052,7 @@ class ImagePanel extends Component {
               QCStatus={this.props.QCStatus}
               Caveat={this.props.Caveat}
               CaveatViolationsResolvedID={this.props.CaveatViolationsResolvedID}
+              EditableCaveat={this.props.EditableCaveat}
               Selected={this.props.Selected}
               SNR={this.props.SNR}
 
@@ -1086,6 +1095,7 @@ ImagePanel.propTypes = {
   HeadersExpanded: PropTypes.string,
   APIFile: PropTypes.string,
   CaveatViolationsResolvedID: PropTypes.string,
+  EditableCaveat: PropTypes.bool
 };
 
 let RImagePanel = React.createFactory(ImagePanel);
