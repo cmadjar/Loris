@@ -143,10 +143,11 @@ class FeedbackMRI
         $query = "SELECT CommentTypeID, PredefinedCommentID, Comment
                       FROM feedback_mri_comments";
 
-        $query .= match ($this->objectType) {
-            'volume' => " WHERE FileID=:FileID",
-            'visit'  => " WHERE SessionID=:SessionID",
-        };
+        if ($this->objectType == 'volume') {
+            $query .= " WHERE FileID=:FileID";
+        } else {
+            $query .= " WHERE SessionID=:SessionID";
+        }
 
         $result = $DB->pselect($query, $this->_buildWhereAssoc());
 
