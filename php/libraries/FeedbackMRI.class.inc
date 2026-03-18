@@ -58,27 +58,6 @@ class FeedbackMRI
     }
 
     /**
-     * Clears all predefined comments from the object
-     * (used prior to re-setting the list of predefined comments)
-     *
-     * @return bool true if operation succeeded
-     */
-    function clearPredefinedComments()
-    {
-        // start the query
-        $query = "DELETE FROM feedback_mri_comments WHERE ".$this->_buildWhere();
-
-        // limit to predefined comments
-        $query .= "AND PredefinedCommentID IS NOT NULL";
-
-        // run the query
-        $success = mysql_query($query);
-
-        // return success
-        return $success;
-    }
-
-    /**
      * Clears all comments from the object
      *
      * @return void
@@ -162,10 +141,15 @@ class FeedbackMRI
 
         // start building the query
         $query = "SELECT CommentTypeID, PredefinedCommentID, Comment
-                      FROM feedback_mri_comments
-                  WHERE ".$this->_buildWhere();
+                      FROM feedback_mri_comments";
 
-        $result = $DB->pselect($query, array());
+        if ($this->objectType == 'volume') {
+            $query .= " WHERE FileID=:FileID";
+        } else {
+            $query .= " WHERE SessionID=:SessionID";
+        }
+
+        $result = $DB->pselect($query, $this->_buildWhereAssoc());
 
         // build the output array
         if (is_array($result)) {
@@ -458,25 +442,6 @@ class FeedbackMRI
         $DB->insert('feedback_mri_comments', $set);
 
         return true;
-    }
-
-    /**
-     * Constructs an appropriate where expression to limit selects to the
-     * current object
-     *
-     * @return string where string to limit selects to current object
-     * @access private
-     */
-    function _buildWhere()
-    {
-        // build the where depending on object and subject type
-        if ($this->objectType == 'volume') {
-            // per-volume
-            return "FileID='$this->fileID'";
-        } else {
-            // per-visit
-            return "SessionID='$this->sessionID'";
-        }
     }
 
     /**
